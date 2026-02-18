@@ -14,7 +14,8 @@ prohibited_goods_agent = Agent(
         instruction=PROHIBITED_GOODS_INSTRUCTION,
         tools=[prohibited_goods_rag],
         output_key="prohibited_goods_result",
-        output_schema=ComplianceCheckResult
+        output_schema=ComplianceCheckResult,
+        include_contents='none'
     )
 
 

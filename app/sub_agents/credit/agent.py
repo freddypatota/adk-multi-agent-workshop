@@ -14,5 +14,6 @@ credit_ceiling_agent = Agent(
         instruction=FINANCIAL_INSTRUCTION,
         tools=[get_financial_context],
         output_key="financial_context",
-        output_schema=FinancialContext
+        output_schema=FinancialContext,
+        include_contents='none'
     )

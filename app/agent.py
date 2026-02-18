@@ -25,10 +25,12 @@ async def before_agent_callback(callback_context: CallbackContext) -> None:
                         display_name = getattr(part.inline_data, "display_name", "uploaded_file")
                         mime_type = getattr(part.inline_data, "mime_type", "unknown_mime_type")
                         files.append(f"'{display_name}' type: {mime_type}")
+                        await callback_context.save_artifact(f"invoice_file_{display_name}", part)
                     elif getattr(part, "file_data", None):
                         file_uri = getattr(part.file_data, "file_uri", "uploaded_file")
                         mime_type = getattr(part.file_data, "mime_type", "unknown_mime_type")
                         files.append(f"'{file_uri}' type: {mime_type}")
+                        await callback_context.save_artifact(f"invoice_file", part)
 
     has_uploaded_file = len(files) > 0
     callback_context.state["has_uploaded_file"] = "YES" if has_uploaded_file else "NO"

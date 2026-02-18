@@ -12,4 +12,5 @@ decision_agent = Agent(
         model=MODEL_NAME,
         instruction=DECISION_INSTRUCTION,
         output_key="validation_report",
+        include_contents='none'
     )

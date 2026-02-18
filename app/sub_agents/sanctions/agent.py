@@ -15,5 +15,6 @@ sanctions_agent = Agent(
         instruction=SANCTIONS_INSTRUCTION,
         tools=[check_sanctions],
         output_key="sanctions_result",
-        output_schema=ComplianceCheckResult
+        output_schema=ComplianceCheckResult,
+        include_contents='none'
     )
