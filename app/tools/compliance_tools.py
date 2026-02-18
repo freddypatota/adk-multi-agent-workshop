@@ -10,9 +10,9 @@ SANCTIONS_LIST = [
     "BadActor Corp", "Evil Industries", "Sanctioned Entity 101"
 ]
 
-def prohibited_goods_rag(line_items: List[Dict[str, Any]]) -> ComplianceCheckResult:
+def prohibited_goods_rag() -> List[str]:
     """
-    Returns the list of prohibited goods.
+    Returns the list of prohibited goods keywords for compliance checking.
     """
     return PROHIBITED_KEYWORDS
 
