@@ -106,6 +106,10 @@ def server_fixture(request: Any) -> Iterator[subprocess.Popen[str]]:
         logger.info("Stopping server process")
         server_process.terminate()
         server_process.wait()
+        if server_process.stdout:
+            server_process.stdout.close()
+        if server_process.stderr:
+            server_process.stderr.close()
         logger.info("Server process stopped")
 
     request.addfinalizer(stop_server)
@@ -118,7 +122,7 @@ def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
 
     # Create session first
     user_id = "test_user_123"
-    session_data = {"state": {"preferred_language": "English", "visit_count": 1}}
+    session_data = {"state": {"has_uploaded_file": False, "uploaded_file_details": {}}}
 
     session_url = f"{BASE_URL}/apps/app/users/{user_id}/sessions"
     session_response = requests.post(
@@ -138,7 +142,7 @@ def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
         "session_id": session_id,
         "new_message": {
             "role": "user",
-            "parts": [{"text": "Hi!"}],
+            "parts": [{"text": "Hello, I'd like to process a loan drawdown"}],
         },
         "streaming": True,
     }
@@ -170,6 +174,8 @@ def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
         ):
             has_text_content = True
             break
+
+    assert has_text_content, "Expected at least one message with text content"
 
 
 def test_chat_stream_error_handling(server_fixture: subprocess.Popen[str]) -> None:
