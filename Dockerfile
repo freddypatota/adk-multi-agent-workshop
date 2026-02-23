@@ -12,24 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM python:3.11-slim
+FROM python:3.13-slim AS backend-builder
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-RUN pip install --no-cache-dir uv==0.8.13
+# Create a non-root user before anything else
+RUN adduser --disabled-password --gecos "" --uid 1001 appuser
 
-WORKDIR /code
+# Set the working directory in the container
+WORKDIR /app
+RUN chown appuser:appuser /app
 
-COPY ./pyproject.toml ./README.md ./
+# Switch to non-root user so all files are created with correct ownership
+USER appuser
 
-COPY ./app ./app
+# Copy dependency files
+COPY --chown=appuser:appuser pyproject.toml uv.lock ./
 
-RUN uv sync
+# Install dependencies (as appuser, so the venv is owned by appuser)
+RUN uv sync --frozen --no-dev
 
-ARG COMMIT_SHA=""
-ENV COMMIT_SHA=${COMMIT_SHA}
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+# Allow statements and log messages to immediately appear in the Knative logs
+ENV PYTHONUNBUFFERED=1
 
-ARG AGENT_VERSION=0.0.0
-ENV AGENT_VERSION=${AGENT_VERSION}
+# Copy the app source code
+COPY --chown=appuser:appuser app ./app
 
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Expose the port
 EXPOSE 8080
 
-CMD ["uv", "run", "uvicorn", "app.fast_api_app:app", "--host", "0.0.0.0", "--port", "8080"]
+# Run the application
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8080", "app.fast_api_app:app"]

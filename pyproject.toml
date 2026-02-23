@@ -1,23 +1,26 @@
 [project]
 name = "loan-drawdown-agent-demo"
 version = "0.1.0"
-description = ""
+description = "Loan Drawdown ADK Demo Agent"
 authors = [
-    {name = "Your Name", email = "your@email.com"},
+    {name = "Mario Sirtmatsis" , email = "msirtmatsis@google.com"},
+    {name = "Federico Patota", email = "fpatota@google.com"}
 ]
+
 dependencies = [
-    "google-adk>=1.15.0,<2.0.0",
+    "google-adk>=1.25.0,<2.0.0",
     "opentelemetry-instrumentation-google-genai>=0.1.0,<1.0.0",
     "gcsfs>=2024.11.0",
     "google-cloud-logging>=3.12.0,<4.0.0",
-    "google-cloud-aiplatform[evaluation]==1.130.0",
+    "google-cloud-aiplatform[evaluation]>=1.130.0",
     "fastapi>=0.115.8,<1.0.0",
     "uvicorn~=0.34.0",
     "asyncpg>=0.30.0,<1.0.0",
     "python-dotenv>=1.2.1",
+    "gunicorn>=25.1.0",
 ]
-requires-python = ">=3.10,<3.14"
 
+requires-python = ">=3.10,<3.14"
 
 [dependency-groups]
 dev = [
@@ -39,9 +42,13 @@ lint = [
     "codespell>=2.2.0,<3.0.0",
 ]
 
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true
+
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [
@@ -54,7 +61,7 @@ select = [
     "UP", # pyupgrade
     "RUF", # ruff specific rules
 ]
-ignore = ["E501", "C901", "B006"] # ignore line too long, too complex
+ignore = ["E501", "C901", "UP045"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["app", "frontend"]
@@ -64,7 +71,7 @@ known-first-party = ["app", "frontend"]
 # See: https://docs.astral.sh/ty/
 
 [tool.ty.environment]
-python-version = "3.10"
+python-version = "3.13"
 
 [tool.ty.src]
 exclude = [".venv/**"]
@@ -93,6 +100,10 @@ build-backend = "hatchling.build"
 [tool.pytest.ini_options]
 pythonpath = "."
 asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "ignore:Inheritance class AiohttpClientSession:DeprecationWarning",
+    "ignore:\\[EXPERIMENTAL\\] feature:UserWarning",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["app","frontend"]

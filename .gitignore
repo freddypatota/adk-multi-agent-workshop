@@ -201,3 +201,7 @@ my_env.tfvars
 
 # A2A Inspector
 tools/a2a-inspector/
+
+GEMINI.md
+.ruff_cache
+
