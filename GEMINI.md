@@ -71,7 +71,7 @@ def get_weather(city: str) -> dict:
 
 my_agent = Agent(
     name="weather_agent",
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     instruction="You help users check the weather. Use the get_weather tool.",
     description="Provides weather information.",  # Important for multi-agent delegation
     tools=[get_weather]
@@ -86,7 +86,7 @@ from google.adk.agents import Agent
 
 agent = Agent(
     name="my_agent",
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     instruction="Your instructions here. Use {state_key} for dynamic injection.",
     description="Description for delegation.",
 
@@ -136,7 +136,7 @@ class Evaluation(BaseModel):
 
 evaluator = Agent(
     name="evaluator",
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     instruction="Evaluate the input and provide structured feedback.",
     output_schema=Evaluation,
     output_key="evaluation_result",
@@ -179,14 +179,14 @@ from google.adk.agents import SequentialAgent, Agent
 
 summarizer = Agent(
     name="summarizer",
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     instruction="Summarize the input.",
     output_key="summary"
 )
 
 question_gen = Agent(
     name="question_generator",
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     instruction="Generate questions based on: {summary}"
 )
 
@@ -325,7 +325,7 @@ class EscalationChecker(BaseAgent):
 # Vertex AI (prod)
 # Set: GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION, GOOGLE_GENAI_USE_VERTEXAI=True
 
-agent = Agent(model="gemini-2.0-flash", ...)
+agent = Agent(model="gemini-2.5-flash", ...)
 ```
 
 ### Other Models via LiteLLM
@@ -949,7 +949,7 @@ types.Tool(function_declarations=[...])
 2. Only test function-based tools in `tool_uses` and accept the trajectory will be incomplete
 
 **Model thinking mode may bypass tools:**
-Models with "thinking" enabled may decide they have sufficient information and skip tool calls. Use `tool_config` with `mode="ANY"` to force tool usage, or switch to a non-thinking model like `gemini-2.0-flash` for predictable tool calling.
+Models with "thinking" enabled may decide they have sufficient information and skip tool calls. Use `tool_config` with `mode="ANY"` to force tool usage, or switch to a non-thinking model like `gemini-2.5-flash` for predictable tool calling.
 
 **Sub-agents need instances, not function references:**
 When using multi-agent systems with `sub_agents`, you must pass **Agent instances**, not factory function references.
@@ -1719,7 +1719,7 @@ Before finalizing any code replacement, verify:
 *   **Model Selection - CRITICAL:**
     *   **NEVER change the model unless explicitly asked.** If the code uses `gemini-3-flash-preview`, keep it as `gemini-3-flash-preview`. Do NOT "upgrade" or "fix" model names.
     *   When creating NEW agents (not modifying existing), use Gemini 3 series: `gemini-3-flash-preview`, `gemini-3-pro-preview`.
-    *   Do NOT use older models (`gemini-2.0-flash`, `gemini-1.5-flash`, etc.) unless the user explicitly requests them.
+    *   Do NOT use older models (`gemini-2.5-flash`, `gemini-1.5-flash`, etc.) unless the user explicitly requests them.
 
 *   **Location Matters More Than Model:**
     *   If a model returns a 404, it's almost always a `GOOGLE_CLOUD_LOCATION` issue (e.g., needing `global` instead of `europe-west3`).

@@ -1,8 +1,6 @@
 # loan-drawdown-agent-demo
 
-A multi-agent demonstration project built with the [Google Cloud Agent Development Kit (ADK)](https://google.github.io/adk-docs/llms.txt) for processing automated loan drawdown requests from invoices. 
-
-Agent scaffold generated with [`googleCloudPlatform/agent-starter-pack`](https://github.com/GoogleCloudPlatform/agent-starter-pack) version `0.36.0`.
+A multi-agent demonstration project built with the [Google Cloud Agent Development Kit (ADK)](https://google.github.io/adk-docs/llms.txt) for processing automated loan drawdown requests from invoices.
 
 ## Architecture Guide
 
@@ -24,18 +22,34 @@ Once an invoice is provided, the process delegates to a Sequential Workflow:
 
 ```
 loan-drawdown-agent-demo/
-├── app/                       # Core agent code
-│   ├── agent.py               # Main agent logic (Root Orchestrator)
-│   ├── fast_api_app.py        # FastAPI Backend server
-│   ├── sub_agents/            # Individual workflow agents (extraction, credit, decision, etc.)
-│   └── app_utils/             # App utilities and helpers
-├── tests/                     # Unit, integration, and load tests
-├── GEMINI.md                  # AI-assisted development guide
-├── Makefile                   # Development commands
-└── pyproject.toml             # Project dependencies
+├── app/
+│   ├── fast_api_app.py                        # FastAPI backend server
+│   ├── utils/                                 # Logging, telemetry, and typing utilities
+│   └── agents/
+│       └── loan_drawdown_agent/               # Self-contained agent package
+│           ├── agent.py                       # Root orchestrator (entry point)
+│           ├── callbacks/                     # Lifecycle hooks (e.g. file upload detection)
+│           ├── config/                        # Prompts and constants
+│           ├── schemas/                       # Pydantic data models (invoice, compliance, financial)
+│           ├── services/                      # Mock banking services (George, IBH rates)
+│           ├── tools/                         # Agent tools (compliance checks, financial context)
+│           └── sub_agents/                    # Individual workflow agents
+│               ├── extraction_agent.py        # Invoice data extraction
+│               ├── prohibited_goods_agent.py  # Prohibited goods compliance check
+│               ├── sanctions_agent.py         # Sanctions list validation
+│               ├── credit_ceiling_agent.py    # Credit ceiling validation
+│               └── decision_agent.py          # Final approval/rejection decision
+├── tests/
+│   ├── unit/                                  # Unit tests for tools and services
+│   ├── integration/                           # Integration tests (agent stream, server e2e)
+│   └── eval/                                  # ADK evaluation sets
+├── .env example                               # Template for environment variables
+├── GEMINI.md                                  # AI-assisted development guide
+├── Makefile                                   # Development commands
+└── pyproject.toml                             # Project dependencies
 ```
 
-> 💡 **Tip:** Use [Gemini CLI](https://github.com/google-gemini/gemini-cli) for AI-assisted development - project context is pre-configured in `GEMINI.md`.
+> **Tip:** Use [Gemini CLI](https://github.com/google-gemini/gemini-cli) for AI-assisted development - project context is pre-configured in `GEMINI.md`.
 
 ## Requirements
 
@@ -45,42 +59,48 @@ Before you begin, ensure you have:
 - **make**: Build automation tool - [Install](https://www.gnu.org/software/make/) (pre-installed on most Unix-based systems)
 
 
-## Quick Start
+## Configuration
 
-Install required packages and launch the local development environment:
+Copy the environment template and fill in your GCP project details:
 
 ```bash
-make install && make playground
+cp ".env example" .env
+```
+
+The `.env` file requires the following variables:
+
+| Variable                     | Description                                    |
+| ---------------------------- | ---------------------------------------------- |
+| `GOOGLE_GENAI_USE_VERTEXAI`  | Set to `TRUE` to use Vertex AI                 |
+| `GOOGLE_CLOUD_PROJECT`       | Your GCP project ID                            |
+| `GOOGLE_CLOUD_LOCATION`      | GCP region (e.g. `europe-west4`)               |
+| `MODEL_NAME`                 | Gemini model to use (e.g. `gemini-2.5-flash`)  |
+
+## Quick Start
+
+```bash
+make install    # Install dependencies
+make auth       # Authenticate with Google Cloud
+make playground # Launch local ADK playground
 ```
 
 ## Commands
 
-| Command              | Description                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------- |
-| `make install`       | Install dependencies using uv                                                               |
-| `make playground`    | Launch local development environment                                                        |
-| `make lint`          | Run code quality checks                                                                     |
-| `make test`          | Run unit and integration tests                                                              |
-| `make deploy`        | Deploy agent to Cloud Run                                                                   |
-| `make local-backend` | Launch local development server with hot-reload                                             |
+| Command              | Description                                      |
+| -------------------- | ------------------------------------------------ |
+| `make install`       | Install dependencies using uv                    |
+| `make auth`          | Authenticate with Google Cloud and set project   |
+| `make playground`    | Launch local ADK playground                      |
+| `make local-backend` | Launch FastAPI server with hot-reload            |
+| `make test`          | Run unit and integration tests                   |
+| `make lint`          | Run code quality checks (codespell, ruff, ty)    |
+| `make eval`          | Run agent evaluation using ADK eval              |
+| `make deploy`        | Deploy agent to Cloud Run                        |
+| `make clean`         | Remove temporary files and caches                |
+| `make kill`          | Kill local development processes on common ports |
 
 For full command options and usage, refer to the [Makefile](Makefile).
-
-## 🛠️ Project Management
-
-| Command | What It Does |
-|---------|--------------|
-| `uvx agent-starter-pack enhance` | Add CI/CD pipelines and Terraform infrastructure |
-| `uvx agent-starter-pack setup-cicd` | One-command setup of entire CI/CD pipeline + infrastructure |
-| `uvx agent-starter-pack upgrade` | Auto-upgrade to latest version while preserving customizations |
-| `uvx agent-starter-pack extract` | Extract minimal, shareable version of your agent |
-
----
-
-## Development
-
-Edit your agent logic in `app/agent.py` and test with `make playground` - it auto-reloads on save.
-See the [development guide](https://googlecloudplatform.github.io/agent-starter-pack/guide/development-guide) for the full workflow.
+For evaluation set format and usage, see the [evalsets guide](tests/eval/evalsets/README.md).
 
 ## Deployment
 
@@ -89,11 +109,6 @@ gcloud config set project <your-project-id>
 make deploy
 ```
 
-To add CI/CD and Terraform, run `uvx agent-starter-pack enhance`.
-To set up your production infrastructure, run `uvx agent-starter-pack setup-cicd`.
-See the [deployment guide](https://googlecloudplatform.github.io/agent-starter-pack/guide/deployment) for details.
-
 ## Observability
 
 Built-in telemetry exports to Cloud Trace, BigQuery, and Cloud Logging.
-See the [observability guide](https://googlecloudplatform.github.io/agent-starter-pack/guide/observability) for queries and dashboards.
