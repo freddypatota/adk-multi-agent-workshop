@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import logging
-import os
 import sys
 
 # Try to import Google Cloud Logging, but don't fail if strictly local without deps
 try:
     import google.cloud.logging
     from google.cloud.logging.handlers import CloudLoggingHandler
+
     HAS_GOOGLE_CLOUD_LOGGING = True
 except ImportError:
     HAS_GOOGLE_CLOUD_LOGGING = False

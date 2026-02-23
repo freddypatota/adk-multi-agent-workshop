@@ -18,9 +18,9 @@ import google.auth
 from fastapi import FastAPI
 from google.adk.cli.fast_api import get_fast_api_app
 
-from app.app_utils.logging_config import setup_logging, get_logger
-from app.app_utils.telemetry import setup_telemetry
-from app.app_utils.typing import Feedback
+from .utils.logging_config import get_logger, setup_logging
+from .utils.telemetry import setup_telemetry
+from .utils.typing import Feedback
 
 setup_logging()
 setup_telemetry()
@@ -34,7 +34,7 @@ allow_origins = (
 # Artifact bucket for ADK (created by Terraform, passed via env var)
 logs_bucket_name = os.environ.get("LOGS_BUCKET_NAME")
 
-AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+AGENT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "agents")
 # In-memory session configuration - no persistent storage
 session_service_uri = None
 
@@ -44,6 +44,7 @@ app: FastAPI = get_fast_api_app(
     agents_dir=AGENT_DIR,
     web=True,
     artifact_service_uri=artifact_service_uri,
+    use_local_storage=False,
     allow_origins=allow_origins,
     session_service_uri=session_service_uri,
     otel_to_cloud=True,
@@ -70,4 +71,4 @@ def collect_feedback(feedback: Feedback) -> dict[str, str]:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8080)
