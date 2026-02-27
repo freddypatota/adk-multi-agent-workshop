@@ -12,6 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Stage 1: Build the frontend
+FROM node:current-alpine3.22 AS frontend-builder
+WORKDIR /app/frontend
+COPY frontend/ ./
+RUN npm install
+# Inject environment variables if available
+RUN if [ -f env.production ]; then mv env.production .env; fi
+RUN npm run build
+
+# Stage 2: Build the backend
 FROM python:3.13-slim AS backend-builder
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
@@ -42,8 +52,11 @@ COPY --chown=appuser:appuser app ./app
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 
+# Copy built frontend from the previous stage
+COPY --chown=appuser:appuser --from=frontend-builder /app/frontend/dist ./frontend/dist
+
 # Expose the port
 EXPOSE 8080
 
 # Run the application
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8080", "app.fast_api_app:app"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8080", "app.main:app"]
