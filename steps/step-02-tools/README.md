@@ -8,6 +8,8 @@
 
 ## ADK Concepts
 
+> **Documentation:** [Function Tools](https://google.github.io/adk-docs/tools-custom/function-tools/) | [Tool Performance](https://google.github.io/adk-docs/tools-custom/performance/) | [Tool Limitations](https://google.github.io/adk-docs/tools/limitations/)
+
 ### Function Tools
 
 Any Python function can become an agent tool. ADK inspects the function's signature, type hints, and docstring to auto-generate the tool schema for the LLM:
