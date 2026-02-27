@@ -18,11 +18,11 @@ def get_financial_context(client_id: str, invoice_amount: float, currency: str) 
     approved = exposure_data["approved_limit"]
     current = exposure_data["current_exposure"]
     remaining = approved - current
-
     is_within = remaining >= converted_amount
 
-    return FinancialContext(
+    financial_context = FinancialContext(
         client_id=client_id,
+        currency=exposure_data["currency"],
         approved_limit=approved,
         current_exposure=current,
         remaining_limit=remaining,
@@ -30,3 +30,5 @@ def get_financial_context(client_id: str, invoice_amount: float, currency: str) 
         conversion_rate=rate,
         is_within_limit=is_within,
     ).model_dump()
+
+    return financial_context

@@ -10,7 +10,10 @@ PROHIBITED_KEYWORDS = [
     "Alcohol",
 ]
 
-SANCTIONS_LIST = ["BadActor Corp", "Evil Industries", "Sanctioned Entity 101"]
+SANCTIONS_LIST = [
+    name.lower()
+    for name in ["BadActor Corp", "Evil Industries", "Sanctioned Entity 101"]
+]
 
 
 def prohibited_goods_rag() -> list[str]:
@@ -20,12 +23,12 @@ def prohibited_goods_rag() -> list[str]:
     return PROHIBITED_KEYWORDS
 
 
-def check_sanctions(vendor_name: str) -> ComplianceCheckResult:
+def check_sanctions(vendor_name: str) -> dict:
     """
     Checks if the vendor is on a sanctions list.
     """
     flags = []
-    if vendor_name in SANCTIONS_LIST:
+    if vendor_name.strip().lower() in SANCTIONS_LIST:
         flags.append(f"Vendor '{vendor_name}' is on the Sanctions List.")
 
     status = "FAIL" if flags else "PASS"
@@ -33,6 +36,8 @@ def check_sanctions(vendor_name: str) -> ComplianceCheckResult:
         "Sanctions match found." if flags else "Vendor not found in sanctions list."
     )
 
-    return ComplianceCheckResult(
-        check_name="Sanctions Check", status=status, flags=flags, reason=reason
+    sanctions_check_result = ComplianceCheckResult(
+        check_name="Sanctions", status=status, flags=flags, reason=reason
     ).model_dump()
+
+    return sanctions_check_result

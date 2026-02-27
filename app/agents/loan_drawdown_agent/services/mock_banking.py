@@ -55,11 +55,14 @@ class MockIBH:
         rates = {
             "EUR-RON": 4.97,
             "USD-RON": 4.60,
+            "CHF-RON": 5.58,
             "RON-EUR": 1 / 4.97,
             "RON-USD": 1 / 4.60,
+            "RON-CHF": 1 / 5.58,
             "RON-RON": 1.0,
             "EUR-EUR": 1.0,
             "USD-USD": 1.0,
+            "CHF-CHF": 1.0,
         }
 
         return rates.get(
