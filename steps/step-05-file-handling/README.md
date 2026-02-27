@@ -5,6 +5,7 @@
 - Use `before_model_callback` to modify the LLM request before it's sent
 - Understand how to inject multimodal content (files) into an LLM context
 - Learn the artifact storage and state fallback pattern
+- Add batch processing support with wrapper schemas
 - Test the complete application with the pre-built frontend
 
 ## ADK Concepts
@@ -52,7 +53,30 @@ Open `sub_agents/extraction_agent.py`:
 - Import `inject_invoice_content`
 - Add `before_model_callback=inject_invoice_content` to the Agent
 
-### 3. Test with the frontend
+### 3. Add batch processing schemas
+
+To support multiple invoices in a single request, each agent needs to output a **list** of results instead of a single result.
+
+Open `schemas/data_models.py` and define 4 batch wrapper models:
+
+- `InvoiceBatch` — wraps `list[InvoiceData]` in an `invoices` field
+- `ComplianceBatchResult` — wraps `list[ComplianceCheckResult]` in a `results` field
+- `FinancialBatchContext` — wraps `list[FinancialContext]` in a `results` field
+- `BatchValidationReport` — wraps `list[ValidationReport]` in a `reports` field
+
+### 4. Update sub-agents to use batch schemas
+
+Update each sub-agent's `output_schema` to the batch wrapper (look for the `TODO(workshop)` comments):
+
+| Agent | Single schema | Batch schema |
+| --- | --- | --- |
+| `extraction_agent` | `InvoiceData` | `InvoiceBatch` |
+| `sanctions_agent` | `ComplianceCheckResult` | `ComplianceBatchResult` |
+| `prohibited_goods_agent` | `ComplianceCheckResult` | `ComplianceBatchResult` |
+| `credit_ceiling_agent` | `FinancialContext` | `FinancialBatchContext` |
+| `decision_agent` | `ValidationReport` | `BatchValidationReport` |
+
+### 5. Test with the frontend
 
 The frontend is pre-built. Run both backend and frontend:
 
@@ -74,6 +98,7 @@ Open http://localhost:5173 and:
 
 - Uploading an invoice extracts real data (not hallucinated)
 - All workflow stages complete: extraction, sanctions, prohibited goods, credit ceiling, decision
+- Uploading multiple invoices produces per-invoice results with batch schemas
 - The workflow dashboard shows structured results for each stage
 
 ## Solution

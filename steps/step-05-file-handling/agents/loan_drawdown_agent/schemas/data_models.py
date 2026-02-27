@@ -50,3 +50,32 @@ class ValidationReport(BaseModel):
     decision: Literal["APPROVED", "REJECTED", "TO BE REVIEWED"] = Field(...)
     checks: list[CheckSummary] = Field(...)
     conclusion: str = Field(...)
+
+
+# --- Batch wrappers for multi-invoice processing ---
+# When a user uploads multiple files, each agent processes all invoices
+# and outputs a list of results (one per invoice, in the same order).
+
+# TODO(workshop): Define batch wrapper models.
+# Each wrapper holds a list of the corresponding single-invoice model.
+#
+# Hint:
+# class InvoiceBatch(BaseModel):
+#     invoices: list[InvoiceData] = Field(
+#         ..., description="List of extracted invoices, one per uploaded file"
+#     )
+#
+# class ComplianceBatchResult(BaseModel):
+#     results: list[ComplianceCheckResult] = Field(
+#         ..., description="One compliance result per invoice, in the same order"
+#     )
+#
+# class FinancialBatchContext(BaseModel):
+#     results: list[FinancialContext] = Field(
+#         ..., description="One financial context per invoice, in the same order"
+#     )
+#
+# class BatchValidationReport(BaseModel):
+#     reports: list[ValidationReport] = Field(
+#         ..., description="One validation report per invoice, in the same order"
+#     )
