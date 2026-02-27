@@ -1,0 +1,83 @@
+{
+  "app": {
+    "title": "Loan Drawdown"
+  },
+  "common": {
+    "toggleTheme": "Toggle Theme",
+    "closeSidebar": "Close Sidebar",
+    "openSidebar": "Open Sidebar",
+    "theme": "Theme"
+  },
+  "login": {
+    "welcomeBack": "Welcome Back",
+    "subtitle": "Sign in to process loan drawdown requests",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "name@example.com",
+    "signInEmail": "Sign in with Email",
+    "orContinueWith": "Or continue with",
+    "google": "Google"
+  },
+  "backend": {
+    "unavailable": "Backend Unavailable",
+    "connectionError": "Unable to connect to backend services",
+    "retry": "Retry",
+    "waiting": "Waiting for backend to be ready...",
+    "startupNote": "This may take a moment on first startup"
+  },
+  "chat": {
+    "thinking": "Thinking...",
+    "cancel": "Cancel",
+    "placeholderChat": "Describe your loan drawdown request or attach an invoice...",
+    "placeholderHomepage": "Start a loan drawdown request..."
+  },
+  "workflow": {
+    "title": "Workflow Progress",
+    "uploadedFile": "Uploaded File",
+    "noFiles": "No files uploaded yet",
+    "extraction": "Invoice Extraction",
+    "sanctions": "Sanctions Check",
+    "prohibitedGoods": "Prohibited Goods Check",
+    "creditCeiling": "Credit Ceiling",
+    "decision": "Decision",
+    "pending": "Pending",
+    "pass": "PASS",
+    "fail": "FAIL",
+    "noData": "Awaiting data...",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "toBeReviewed": "To Be Reviewed",
+    "flagged": "FLAGGED",
+    "vendor": "Vendor",
+    "amount": "Amount",
+    "date": "Date",
+    "lineItems": "Line Items",
+    "flags": "Flags",
+    "approvedLimit": "Approved Limit",
+    "currentExposure": "Current Exposure",
+    "remainingCapacity": "Remaining Capacity",
+    "withinLimit": "Within Limit"
+  },
+  "timeline": {
+    "research": "Agent Activity",
+    "noSources": "No sources found.",
+    "callingFunction": "Calling function: {{name}}",
+    "arguments": "Arguments",
+    "functionResponse": "Function {{name}} response:",
+    "untitledSource": "Untitled Source",
+    "thinking": "Thinking...",
+    "noActivity": "No activity to display.",
+    "timelineUpdate": "Timeline will update during processing.",
+    "callingTool": "Calling tool: {{name}}",
+    "toolResponse": "Tool {{name}} response:"
+  },
+  "ui": {
+    "generalSettings": "General Settings",
+    "showTimeline": "Show Activity Timeline",
+    "autoScroll": "Auto-scroll to New Messages",
+    "useStreaming": "Stream Agent Responses"
+  },
+  "error": {
+    "processingRequest": "Sorry, there was an error processing your request: {{message}}"
+  }
+}
