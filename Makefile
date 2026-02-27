@@ -98,11 +98,20 @@ kill: ## Kill local development processes (ports 8000-8004)
 # ==============================================================================
 
 # Launch local dev playground
+# Usage: make playground                           (runs final app)
+#        make playground STEP=step-01-first-agent   (runs a workshop step)
+#        make playground STEP=step-02-tools          etc.
 playground:
 	@echo "==============================================================================="
 	@echo "| 🚀 Starting your agent playground...                                        |"
 	@echo "==============================================================================="
+ifdef STEP
+	@echo "| Workshop step: $(STEP)"
+	@echo "==============================================================================="
+	uv run adk web steps/$(STEP)/ --port 8501 --reload_agents
+else
 	uv run adk web app/agents/ --port 8501 --reload_agents --no_use_local_storage
+endif
 
 # ==============================================================================
 # Local Development Commands

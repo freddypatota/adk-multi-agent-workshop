@@ -2,6 +2,41 @@
 
 A multi-agent demonstration project built with the [Google Cloud Agent Development Kit (ADK)](https://google.github.io/adk-docs/llms.txt) for processing automated loan drawdown requests from invoices. Includes a React frontend with real-time workflow visualization.
 
+## Workshop
+
+This branch contains a hands-on workshop that guides you through building the loan drawdown agent step by step. Each step introduces new ADK concepts and builds on the previous one.
+
+### Steps
+
+| Step | Folder | Concepts |
+| --- | --- | --- |
+| 1 | [step-01-first-agent](steps/step-01-first-agent/) | Agent, model, instruction, ADK playground |
+| 2 | [step-02-tools](steps/step-02-tools/) | Function tools, Pydantic schemas, structured output |
+| 3 | [step-03-multi-agent](steps/step-03-multi-agent/) | SequentialAgent, ParallelAgent, output_key, state flow |
+| 4 | [step-04-agent-tool](steps/step-04-agent-tool/) | AgentTool, before_agent_callback, session state |
+| 5 | [step-05-file-handling](steps/step-05-file-handling/) | before_model_callback, LlmRequest, multimodal files |
+
+### How to Run a Step
+
+```bash
+make install                                    # First time: install all dependencies
+make playground STEP=step-01-first-agent        # Run any step in the playground
+```
+
+Each step folder has a `README.md` with detailed instructions. Solutions are in `solutions/step-XX/`.
+
+### Workshop Flow
+
+1. Read the step's README for concepts and instructions
+2. Edit the code in `steps/step-XX/agents/loan_drawdown_agent/`
+3. Test with `make playground STEP=step-XX-name`
+4. If stuck, check `solutions/step-XX/` for the working code
+5. Move to the next step (which includes your previous work already completed)
+
+The final complete application is in `app/` with a full React frontend in `frontend/`.
+
+---
+
 ## Architecture Guide
 
 The application uses a coordinated multi-agent workflow to process loan drawdowns based on uploaded invoice files. It supports both single and batch invoice processing.
