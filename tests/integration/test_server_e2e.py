@@ -26,14 +26,14 @@ import pytest
 import requests
 from requests.exceptions import RequestException
 
+from app.agents.loan_drawdown_agent.config import AGENT_NAME
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-BASE_URL = "http://127.0.0.1:8000/"
-STREAM_URL = BASE_URL + "run_sse"
-FEEDBACK_URL = BASE_URL + "feedback"
-
+BASE_URL = "http://127.0.0.1:8000/api"
+STREAM_URL = f"{BASE_URL}/run_sse"
 HEADERS = {"Content-Type": "application/json"}
 
 
@@ -49,7 +49,7 @@ def start_server() -> subprocess.Popen[str]:
         sys.executable,
         "-m",
         "uvicorn",
-        "app.fast_api_app:app",
+        "app.main:app",
         "--host",
         "0.0.0.0",
         "--port",
@@ -122,9 +122,9 @@ def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
 
     # Create session first
     user_id = "test_user_123"
-    session_data = {"state": {"has_uploaded_file": False, "uploaded_file_details": {}}}
+    session_data = {"state": {"has_uploaded_file": False, "uploaded_file_details": []}}
 
-    session_url = f"{BASE_URL}/apps/app/users/{user_id}/sessions"
+    session_url = f"{BASE_URL}/apps/{AGENT_NAME}/users/{user_id}/sessions"
     session_response = requests.post(
         session_url,
         headers=HEADERS,
@@ -137,7 +137,7 @@ def test_chat_stream(server_fixture: subprocess.Popen[str]) -> None:
 
     # Then send chat message
     data = {
-        "app_name": "app",
+        "app_name": AGENT_NAME,
         "user_id": user_id,
         "session_id": session_id,
         "new_message": {
@@ -192,22 +192,3 @@ def test_chat_stream_error_handling(server_fixture: subprocess.Popen[str]) -> No
         f"Expected status code 422, got {response.status_code}"
     )
     logger.info("Error handling test completed successfully")
-
-
-def test_collect_feedback(server_fixture: subprocess.Popen[str]) -> None:
-    """
-    Test the feedback collection endpoint (/feedback) to ensure it properly
-    logs the received feedback.
-    """
-    # Create sample feedback data
-    feedback_data = {
-        "score": 4,
-        "user_id": "test-user-456",
-        "session_id": "test-session-456",
-        "text": "Great response!",
-    }
-
-    response = requests.post(
-        FEEDBACK_URL, json=feedback_data, headers=HEADERS, timeout=10
-    )
-    assert response.status_code == 200

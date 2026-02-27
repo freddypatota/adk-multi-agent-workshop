@@ -1,26 +1,24 @@
 [project]
 name = "loan-drawdown-agent-demo"
-version = "0.1.0"
+version = "1.0.0"
 description = "Loan Drawdown ADK Demo Agent"
 authors = [
-    {name = "Mario Sirtmatsis" , email = "msirtmatsis@google.com"},
-    {name = "Federico Patota", email = "fpatota@google.com"}
+    {name = "Federico Patota", email = "fpatota@google.com"},
+    {name = "Mario Sirtmatsis" , email = "msirtmatsis@google.com"}
 ]
 
 dependencies = [
     "google-adk>=1.25.0,<2.0.0",
-    "opentelemetry-instrumentation-google-genai>=0.1.0,<1.0.0",
+    "opentelemetry-instrumentation-google-genai>=0.5.0,<1.0.0",
     "gcsfs>=2024.11.0",
     "google-cloud-logging>=3.12.0,<4.0.0",
-    "google-cloud-aiplatform[evaluation]>=1.130.0",
     "fastapi>=0.115.8,<1.0.0",
     "uvicorn~=0.34.0",
-    "asyncpg>=0.30.0,<1.0.0",
     "python-dotenv>=1.2.1",
     "gunicorn>=25.1.0",
 ]
 
-requires-python = ">=3.10,<3.14"
+requires-python = "==3.13.*"
 
 [dependency-groups]
 dev = [
@@ -35,6 +33,7 @@ jupyter = [
 ]
 eval = [
     "google-adk[eval]>=1.15.0,<2.0.0",
+    "google-cloud-aiplatform[evaluation]>=1.130.0",
 ]
 lint = [
     "ruff>=0.4.6,<1.0.0",
@@ -103,10 +102,11 @@ asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     "ignore:Inheritance class AiohttpClientSession:DeprecationWarning",
     "ignore:\\[EXPERIMENTAL\\] feature:UserWarning",
+    "ignore:LogRecord init with `trace_id`.*is deprecated:UserWarning",
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["app","frontend"]
+packages = ["app"]
 
 [tool.agent-starter-pack]
 # Generation metadata - enables CLI commands to understand project context

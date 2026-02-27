@@ -12,7 +12,7 @@ def test_check_sanctions_pass() -> None:
     result = check_sanctions("Acme Supplies SRL")
     assert result["status"] == "PASS"
     assert result["flags"] == []
-    assert result["check_name"] == "Sanctions Check"
+    assert result["check_name"] == "Sanctions"
 
 
 def test_check_sanctions_fail() -> None:
