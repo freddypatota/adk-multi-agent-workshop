@@ -76,7 +76,15 @@ Update each sub-agent's `output_schema` to the batch wrapper (look for the `TODO
 | `credit_ceiling_agent` | `FinancialContext` | `FinancialBatchContext` |
 | `decision_agent` | `ValidationReport` | `BatchValidationReport` |
 
-### 5. Test with the frontend
+### 5. Update prompts for batch processing
+
+The prompts need to tell each agent to process **all** invoices (not just one). Open `config/prompts.py` and follow the `TODO(workshop)` comment at the top of the file. Key changes:
+
+- **EXTRACTION**: "For each uploaded file, extract the data. Output a list of invoices."
+- **SANCTIONS/PROHIBITED_GOODS/FINANCIAL**: "For each invoice in the batch, run the check. Output one result per invoice."
+- **DECISION**: "Match results by index. Produce one ValidationReport per invoice."
+
+### 6. Test with the frontend
 
 The frontend is pre-built. Run both backend and frontend:
 

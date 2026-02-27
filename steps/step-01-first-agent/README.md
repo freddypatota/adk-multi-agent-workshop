@@ -30,6 +30,17 @@ agent = Agent(
 
 The ADK playground is a local web UI that lets you chat with your agent. It automatically discovers agents from a directory and provides a chat interface.
 
+## Prerequisites
+
+Make sure you have completed the initial setup from the root README:
+
+```bash
+make install    # Install dependencies
+make auth       # Authenticate with Google Cloud
+```
+
+Your `.env` file at the project root should contain your GCP configuration (`GOOGLE_GENAI_USE_VERTEXAI`, `GOOGLE_CLOUD_PROJECT`, etc.). All workshop steps share this single `.env` file — no per-step configuration is needed.
+
 ## Instructions
 
 ### 1. Write the agent instruction

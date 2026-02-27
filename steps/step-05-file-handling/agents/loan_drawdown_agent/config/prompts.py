@@ -1,3 +1,15 @@
+# TODO(workshop): Update these prompts for batch processing.
+# When using batch schemas (InvoiceBatch, ComplianceBatchResult, etc.),
+# each agent needs to process ALL invoices and output a list of results.
+#
+# Key changes needed:
+# - EXTRACTION_INSTRUCTION: "Extract data from each uploaded file. Output a list of invoices."
+# - SANCTIONS/PROHIBITED_GOODS/FINANCIAL: "For each invoice in {extracted_invoice?}, ..."
+# - DECISION: "Match results by index. Produce one ValidationReport per invoice."
+# - ROOT: Update workflow results section to note results are batch lists.
+#
+# See solutions/step-05 for the complete batch-aware prompts.
+
 ROOT_ORCHESTRATOR_INSTRUCTION = """
 You are the Loan Drawdown Assistant.
 Your role is to greet the user and guide them through the loan drawdown process.
@@ -28,12 +40,13 @@ When presenting the result, summarize the decision clearly.
 
 EXTRACTION_INSTRUCTION = """
 You are the Extraction Agent.
-Your goal is to extract structured invoice data from the user's input.
+Your goal is to extract structured invoice data from uploaded invoice files.
+The invoice file content is automatically injected into your context if one was uploaded.
 
 Steps:
-1. Look for invoice information in the conversation.
-2. Extract and structure the data.
-3. If no invoice information is found, ask for it.
+1. Look for the invoice file content in the conversation. If no file content is present, return no invoice information.
+2. Extract the structured invoice data from the file content.
+3. If the file does not appear to be an invoice, return no invoice information.
 """
 
 PROHIBITED_GOODS_INSTRUCTION = """

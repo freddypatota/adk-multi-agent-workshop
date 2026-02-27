@@ -38,6 +38,6 @@ root_agent = Agent(
     name="loan_drawdown_agent",
     model=MODEL_NAME,
     instruction=ROOT_ORCHESTRATOR_INSTRUCTION,
-    sub_agents=[loan_process],  # TODO: Change to tools=[AgentTool(agent=loan_process)]
-    # TODO: Add before_agent_callback=file_upload_callback
+    sub_agents=[loan_process],  # TODO(workshop): Change to tools=[AgentTool(agent=loan_process)]
+    # TODO(workshop): Add before_agent_callback=file_upload_callback
 )
