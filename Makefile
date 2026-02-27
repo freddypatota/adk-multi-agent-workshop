@@ -2,30 +2,36 @@
 # Variables
 # ==============================================================================
 
-# GCP Project Configuration
-PROJECT_ID       := [YOUR_PROJECT_ID]
-PROJECT_NUMBER   := [YOUR_PROJECT_NUMBER]
-PROJECT_LOCATION := europe-west4
-SERVICE_ACCOUNT  := loan-drawdawn-adk-sa@$(PROJECT_ID).iam.gserviceaccount.com
-DOMAIN           := [YOUR_DOMAIN_FOR_IAP]
+# GCP Project Configuration — update these for your project
+PROJECT_ID       := [Your GCP project ID, e.g. my-gcp-project]
+PROJECT_NUMBER   := [Your GCP project number, e.g. 123456789012]
+PROJECT_LOCATION := [Your GCP region, e.g. europe-west4]
+DOMAIN           := [Your authorized domain for IAP, e.g. example.com]
+MODEL_NAME       := gemini-2.5-flash
+ARTIFACTS_BUCKET := [Your GCS bucket for artifacts, e.g. my-artifacts-bucket]
+SERVICE_NAME     := loan-drawdown-adk
+SERVICE_ACCOUNT  := $(SERVICE_NAME)-sa@$(PROJECT_ID).iam.gserviceaccount.com
+SERVICE_ACCOUNT_DISPLAY_NAME := 'Loan Drawdown Agent Cloud Run Service Account'
+SERVICE_URL      := https://$(SERVICE_NAME)-$(PROJECT_NUMBER).$(PROJECT_LOCATION).run.app
 
-# Service Configuration
-SERVICE_NAME       := loan-drawdown-agent-demo
-LOGS_BUCKET_NAME   := [YOUR_LOGS_BUCKET_NAME]
-MODEL_NAME         := gemini-2.5-flash
-
-# Service URLs
-SERVICE_URL  := https://$(SERVICE_NAME)-$(PROJECT_NUMBER).$(PROJECT_LOCATION).run.app
-
+# Firebase Configuration — update these for your Firebase project
+FIREBASE_API_KEY             := [Your Firebase API key, e.g. AIzaSy...]
+FIREBASE_AUTH_DOMAIN         := $(PROJECT_ID).firebaseapp.com
+FIREBASE_PROJECT_ID          := $(PROJECT_ID)
+FIREBASE_STORAGE_BUCKET      := $(PROJECT_ID).firebasestorage.app
+FIREBASE_MESSAGING_SENDER_ID := $(PROJECT_NUMBER)
+FIREBASE_APP_ID              := [Your Firebase app ID, e.g. 1:123456789012:web:abc123]
 
 # ==============================================================================
 # Installation & Setup
 # ==============================================================================
 
-# Install dependencies using uv package manager
+# Install all dependencies (Python, frontend, Firebase CLI)
 install:
-	@command -v uv >/dev/null 2>&1 || { echo "uv is not installed. Installing uv..."; curl -LsSf https://astral.sh/uv/0.8.13/install.sh | sh; source $HOME/.local/bin/env; }
+	@command -v uv >/dev/null 2>&1 || { echo "uv is not installed. Installing uv..."; curl -LsSf https://astral.sh/uv/0.8.13/install.sh | sh; source $$HOME/.local/bin/env; }
 	uv sync
+	npm --prefix frontend install
+	@command -v firebase >/dev/null 2>&1 || { echo "Installing Firebase CLI..."; npm install -g firebase-tools; }
 
 auth: # Authenticate with Google Cloud using gcloud CLI
 	gcloud auth application-default login
@@ -33,17 +39,40 @@ auth: # Authenticate with Google Cloud using gcloud CLI
 	gcloud auth application-default set-quota-project $(PROJECT_ID)
 
 setup-apis:
-	gcloud services enable aiplatform.googleapis.com firestore.googleapis.com run.googleapis.com cloudbuild.googleapis.com logging.googleapis.com iam.googleapis.com iap.googleapis.com --project $(PROJECT_ID)
+	gcloud services enable aiplatform.googleapis.com firestore.googleapis.com run.googleapis.com cloudtrace.googleapis.com cloudbuild.googleapis.com logging.googleapis.com iam.googleapis.com iap.googleapis.com --project $(PROJECT_ID)
+
+# Setup Firebase for frontend authentication
+setup-firebase:
+	firebase login
+	firebase projects:addfirebase $(PROJECT_ID) 2>/dev/null || echo "Firebase already enabled for $(PROJECT_ID)"
+	@echo ""
+	@echo "Next steps (manual in Firebase Console):"
+	@echo "  1. Go to https://console.firebase.google.com/project/$(PROJECT_ID)/authentication"
+	@echo "  2. Click 'Get started' to enable Authentication"
+	@echo "  3. Enable 'Email/Password' and 'Google' sign-in providers"
+	@echo "  4. Go to Settings > Authorized domains and add your Cloud Run domain:"
+	@echo "     $(SERVICE_NAME)-$(PROJECT_NUMBER).$(PROJECT_LOCATION).run.app"
+	@echo "  5. Run 'make frontend-env' to generate frontend/.env from Makefile variables"
+
+# Generate frontend/.env from Makefile Firebase variables
+frontend-env:
+	@echo "VITE_FIREBASE_API_KEY=$(FIREBASE_API_KEY)" > frontend/.env
+	@echo "VITE_FIREBASE_AUTH_DOMAIN=$(FIREBASE_AUTH_DOMAIN)" >> frontend/.env
+	@echo "VITE_FIREBASE_PROJECT_ID=$(FIREBASE_PROJECT_ID)" >> frontend/.env
+	@echo "VITE_FIREBASE_STORAGE_BUCKET=$(FIREBASE_STORAGE_BUCKET)" >> frontend/.env
+	@echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$(FIREBASE_MESSAGING_SENDER_ID)" >> frontend/.env
+	@echo "VITE_FIREBASE_APP_ID=$(FIREBASE_APP_ID)" >> frontend/.env
+	@echo "Generated frontend/.env"
 
 setup-sa: ## Create or Update Service Account and grant necessary roles
 	@echo "Checking service account $(SERVICE_ACCOUNT)..."
 	@if gcloud iam service-accounts describe $(SERVICE_ACCOUNT) --project $(PROJECT_ID) >/dev/null 2>&1; then \
 		echo "Service account exists. Updating..."; \
-		gcloud iam service-accounts update $(SERVICE_ACCOUNT) --display-name "Volvo Vän Service Account" --project $(PROJECT_ID) --quiet >/dev/null; \
+		gcloud iam service-accounts update $(SERVICE_ACCOUNT) --display-name "$(SERVICE_ACCOUNT_DISPLAY_NAME)" --project $(PROJECT_ID) --quiet >/dev/null; \
 	else \
 		echo "Creating service account..."; \
 		gcloud iam service-accounts create $(shell echo $(SERVICE_ACCOUNT) | cut -d@ -f1) \
-			--display-name "Volvo Vän Service Account" \
+			--display-name "$(SERVICE_ACCOUNT_DISPLAY_NAME)" \
 			--project $(PROJECT_ID) --quiet >/dev/null; \
 	fi
 	@echo "Granting roles..."
@@ -54,7 +83,7 @@ setup-sa: ## Create or Update Service Account and grant necessary roles
 	@gcloud projects add-iam-policy-binding $(PROJECT_ID) --member="serviceAccount:$(SERVICE_ACCOUNT)" --role="roles/run.invoker" --condition=None --quiet >/dev/null
 	@gcloud projects add-iam-policy-binding $(PROJECT_ID) --member="serviceAccount:$(SERVICE_ACCOUNT)" --role="roles/run.serviceAgent" --condition=None --quiet >/dev/null
 	@gcloud projects add-iam-policy-binding $(PROJECT_ID) --member="serviceAccount:$(SERVICE_ACCOUNT)" --role="roles/secretmanager.secretAccessor" --condition=None --quiet >/dev/null
-	@gcloud storage buckets add-iam-policy-binding gs://$(LOGS_BUCKET_NAME) --member="serviceAccount:$(SERVICE_ACCOUNT)" --role="roles/storage.objectAdmin" --quiet >/dev/null
+	@gcloud storage buckets add-iam-policy-binding gs://$(ARTIFACTS_BUCKET) --member="serviceAccount:$(SERVICE_ACCOUNT)" --role="roles/storage.objectAdmin" --quiet >/dev/null
 	@echo "Done."
 
 clean: ## Clean up temporary files
@@ -81,7 +110,14 @@ playground:
 
 # Launch local development server with hot-reload
 local-backend:
-	uv run uvicorn app.fast_api_app:app --host localhost --port $(or $(PORT),8000) --reload
+	@echo "Agent is running locally at http://localhost:$(or $(PORT),8000)"
+	uv run uvicorn app.main:app --host localhost --port $(or $(PORT),8000) --reload
+
+run-agent: local-backend
+	
+# Build frontend
+build-frontend:
+	npm --prefix frontend run build
 
 # ==============================================================================
 # Backend Deployment Targets
@@ -89,6 +125,13 @@ local-backend:
 
 # Deploy the agent remotely
 deploy:
+	@echo "Generating frontend/env.production..."
+	@echo "VITE_FIREBASE_API_KEY=$(FIREBASE_API_KEY)" > frontend/env.production
+	@echo "VITE_FIREBASE_AUTH_DOMAIN=$(FIREBASE_AUTH_DOMAIN)" >> frontend/env.production
+	@echo "VITE_FIREBASE_PROJECT_ID=$(FIREBASE_PROJECT_ID)" >> frontend/env.production
+	@echo "VITE_FIREBASE_STORAGE_BUCKET=$(FIREBASE_STORAGE_BUCKET)" >> frontend/env.production
+	@echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$(FIREBASE_MESSAGING_SENDER_ID)" >> frontend/env.production
+	@echo "VITE_FIREBASE_APP_ID=$(FIREBASE_APP_ID)" >> frontend/env.production
 	gcloud beta run deploy $(SERVICE_NAME) \
 		--source . \
 		--port 8080 \
@@ -101,10 +144,9 @@ deploy:
 		--set-env-vars GOOGLE_CLOUD_PROJECT=$(PROJECT_ID) \
 		--set-env-vars GOOGLE_CLOUD_LOCATION=$(PROJECT_LOCATION) \
 		--set-env-vars SERVICE_ACCOUNT=$(SERVICE_ACCOUNT) \
-		--set-env-vars HOST_URL=${SERVICE_URL} \
+		--set-env-vars HOST_URL=$(SERVICE_URL) \
 		--set-env-vars MODEL_NAME=$(MODEL_NAME) \
-		--set-env-vars LOGS_BUCKET_NAME=$(LOGS_BUCKET_NAME) \
-		--set-env-vars OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=true \
+		--set-env-vars ARTIFACTS_BUCKET=$(ARTIFACTS_BUCKET) \
 		--memory "4Gi" \
 		--no-cpu-throttling \
 		--min 1
@@ -116,6 +158,8 @@ deploy:
 			--resource-type cloud-run \
 			--service $(SERVICE_NAME) \
 			--condition None
+			@rm frontend/env.production
+	@echo "Cleaned up frontend/env.production"
 
 set-iap:
 	gcloud beta iap web add-iam-policy-binding \
@@ -128,6 +172,7 @@ set-iap:
 
 # Alias for 'make deploy' for backward compatibility
 backend: deploy
+deploy-agent: deploy
 
 # ==============================================================================
 # Testing & Code Quality

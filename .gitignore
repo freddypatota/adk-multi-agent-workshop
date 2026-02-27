@@ -148,8 +148,6 @@ dmypy.json
 # User-specific files
 .terraform*
 .Terraform*
-
-
 tmp*
 
 # Node
@@ -189,18 +187,6 @@ testem.log
 Thumbs.db
 *.vscode*
 
-# Starter pack specific
-.persist_vector_store
-tests/load_test/.results/*.html
-tests/load_test/.results/*.csv
-.locust_env
-my_env.tfvars
-.saved_chats
-.env
-.requirements.txt
-
-# A2A Inspector
-tools/a2a-inspector/
 
 GEMINI.md
 .ruff_cache
