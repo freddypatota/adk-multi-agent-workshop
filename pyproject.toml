@@ -48,6 +48,7 @@ default = true
 [tool.ruff]
 line-length = 88
 target-version = "py313"
+extend-exclude = ["steps", "solutions"]
 
 [tool.ruff.lint]
 select = [
@@ -73,7 +74,7 @@ known-first-party = ["app", "frontend"]
 python-version = "3.13"
 
 [tool.ty.src]
-exclude = [".venv/**"]
+exclude = [".venv/**", "steps/**", "solutions/**"]
 
 [tool.ty.rules]
 # Ignore common issues with third-party libraries and dynamic code patterns
@@ -88,7 +89,7 @@ deprecated = "ignore"
 
 [tool.codespell]
 ignore-words-list = "rouge"
-skip = "./locust_env/*,uv.lock,.venv,./frontend,**/*.ipynb,**/package-lock.json"
+skip = "./locust_env/*,uv.lock,.venv,./frontend,./steps,./solutions,**/*.ipynb,**/package-lock.json"
 
 
 [build-system]
