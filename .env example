@@ -1,4 +1,8 @@
-GOOGLE_GENAI_USE_VERTEXAI="TRUE"
-GOOGLE_CLOUD_PROJECT=[Your GCP Project ID]
-GOOGLE_CLOUD_LOCATION="europe-west4"
-MODEL_NAME="gemini-2.5-flash"
+GOOGLE_GENAI_USE_VERTEXAI=TRUE
+GOOGLE_CLOUD_PROJECT=[Your GCP project ID, e.g. my-gcp-project]
+GOOGLE_CLOUD_LOCATION=europe-west3
+GOOGLE_CLOUD_PROJECT_NUMBER=[Your GCP project number, e.g. 123456789012]
+ARTIFACTS_BUCKET=[Your GCS bucket for artifacts, e.g. my-artifacts-bucket]
+MODEL_NAME=gemini-2.5-flash
+FIREBASE_API_KEY=[Your Firebase API key, e.g. AIzaSy...]
+FIREBASE_APP_ID=[Your Firebase app ID, e.g. 1:123456789012:web:abc123]
