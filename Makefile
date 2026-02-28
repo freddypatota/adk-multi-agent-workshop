@@ -72,6 +72,14 @@ setup-firebase:
 	@echo "     $(SERVICE_NAME)-$(PROJECT_NUMBER).$(PROJECT_LOCATION).run.app"
 	@echo "  5. Run 'make frontend-env' to generate frontend/.env from Makefile variables"
 
+# Generate root .env for ADK agents from Makefile variables
+agent-env:
+	@echo 'GOOGLE_GENAI_USE_VERTEXAI="TRUE"' > .env
+	@echo 'GOOGLE_CLOUD_PROJECT="$(PROJECT_ID)"' >> .env
+	@echo 'GOOGLE_CLOUD_LOCATION="$(PROJECT_LOCATION)"' >> .env
+	@echo 'MODEL_NAME="$(MODEL_NAME)"' >> .env
+	@echo "Generated .env"
+
 # Generate frontend/.env from Makefile Firebase variables
 frontend-env:
 	@echo "VITE_FIREBASE_API_KEY=$(FIREBASE_API_KEY)" > frontend/.env

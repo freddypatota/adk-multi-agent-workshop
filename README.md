@@ -1,6 +1,125 @@
 # loan-drawdown-agent-demo
 
-A multi-agent demonstration project built with the [Google Cloud Agent Development Kit (ADK)](https://google.github.io/adk-docs/llms.txt) for processing automated loan drawdown requests from invoices. Includes a React frontend with real-time workflow visualization.
+A multi-agent demonstration project built with the [Google Cloud Agent Development Kit (ADK)](https://google.github.io/adk-docs/) for processing automated loan drawdown requests from invoices. Includes a React frontend with real-time workflow visualization.
+
+## Requirements
+
+Before you begin, ensure you have:
+
+- **uv**: Python package manager - [Install](https://docs.astral.sh/uv/getting-started/installation/)
+- **Node.js** (v18+): For the frontend and Firebase CLI - [Install](https://nodejs.org/)
+- **Google Cloud SDK**: For GCP services - [Install](https://cloud.google.com/sdk/docs/install)
+- **make**: Build automation tool (pre-installed on most Unix-based systems)
+
+## Setup
+
+Follow these steps in order to get the project running.
+
+### 1. Install dependencies
+
+```bash
+make install
+```
+
+This installs Python packages (via uv), frontend npm packages, and the Firebase CLI.
+
+### 2. Configure Makefile variables
+
+Open the [Makefile](Makefile) and update the variables at the top with your project details:
+
+| Variable | Description |
+| --- | --- |
+| `PROJECT_ID` | Your GCP project ID (e.g. `my-gcp-project`) |
+| `PROJECT_NUMBER` | Your GCP project number (e.g. `123456789012`) |
+| `PROJECT_LOCATION` | Your GCP region (e.g. `europe-west4`) |
+| `DOMAIN` | Authorized domain for IAP access (e.g. `example.com`) |
+| `ARTIFACTS_BUCKET` | GCS bucket for artifacts (e.g. `my-artifacts-bucket`) |
+| `FIREBASE_API_KEY` | Firebase API key (from Firebase Console — see step 5) |
+| `FIREBASE_APP_ID` | Firebase web app ID (from Firebase Console — see step 5) |
+
+The remaining variables (`SERVICE_ACCOUNT`, `SERVICE_URL`, `FIREBASE_AUTH_DOMAIN`, etc.) are derived automatically.
+
+### 3. Authenticate with Google Cloud
+
+```bash
+make auth
+```
+
+### 4. Enable required GCP APIs
+
+```bash
+make setup-apis
+```
+
+This enables Vertex AI, Firestore, Cloud Run, Cloud Trace, and other required services on your project.
+
+### 5. Generate the backend environment file
+
+```bash
+make agent-env
+```
+
+This creates a `.env` file at the project root from the Makefile variables. Alternatively, copy the template and fill it in manually:
+
+```bash
+cp ".env example" .env
+```
+
+| Variable | Description |
+| --- | --- |
+| `GOOGLE_GENAI_USE_VERTEXAI` | Set to `TRUE` to use Vertex AI |
+| `GOOGLE_CLOUD_PROJECT` | Your GCP project ID |
+| `GOOGLE_CLOUD_LOCATION` | GCP region (e.g. `europe-west4`) |
+| `MODEL_NAME` | Gemini model to use (e.g. `gemini-2.5-flash`) |
+
+### 6. Set up Firebase Authentication (for the frontend)
+
+The frontend uses Firebase Authentication. This step is only needed if you want to run the full app with the frontend (not required for the ADK playground).
+
+**a.** Enable Firebase for your GCP project:
+
+```bash
+make setup-firebase
+```
+
+**b.** In the [Firebase Console](https://console.firebase.google.com), enable Authentication providers:
+
+- Go to **Authentication** > **Sign-in method**
+- Enable **Email/Password** and **Google**
+
+**c.** Add authorized domains:
+
+- Go to **Authentication** > **Settings** > **Authorized domains**
+- `localhost` is already listed (for local development)
+- For Cloud Run deployment, add: `<service-name>-<project-number>.<region>.run.app`
+
+**d.** Register a web app and get SDK config:
+
+- Go to **Project Settings** > **General** > **Your apps** > **Add app** > **Web**
+- Copy the `FIREBASE_API_KEY` and `FIREBASE_APP_ID` values back into the [Makefile variables](#2-configure-makefile-variables)
+
+**e.** Generate the frontend environment file:
+
+```bash
+make frontend-env
+```
+
+## Quick Start
+
+After completing the setup above:
+
+```bash
+make playground    # Launch ADK playground (agent only, no frontend)
+```
+
+To run the full app with the frontend:
+
+```bash
+make build-frontend
+make run-agent
+```
+
+---
 
 ## Workshop
 
@@ -19,13 +138,8 @@ This branch contains a hands-on workshop that guides you through building the lo
 ### How to Run a Step
 
 ```bash
-make install                                    # First time: install all dependencies
-cp ".env example" .env                          # First time: create .env and fill in your project details
-make auth                                       # First time: authenticate with Google Cloud
-make playground STEP=step-01-first-agent        # Run any step in the playground
+make playground STEP=step-01-first-agent
 ```
-
-Each step folder has a `README.md` with detailed instructions. Solutions are in `solutions/step-XX/`.
 
 ### Workshop Flow
 
@@ -44,9 +158,11 @@ The final complete application is in `app/` with a full React frontend in `front
 The application uses a coordinated multi-agent workflow to process loan drawdowns based on uploaded invoice files. It supports both single and batch invoice processing.
 
 ### Root Orchestrator
+
 The root LLM Agent interacts with the user, ensuring one or more invoice files are uploaded before initiating the drawdown workflow. It uses `AgentTool` to delegate to the loan process.
 
 ### Loan Process Workflow
+
 Once invoices are provided, the process delegates to a Sequential Workflow that handles all invoices in a single pass:
 
 1. **Extraction**: Analyzes the uploaded invoices to extract structured data (via `before_model_callback` that injects file content from artifacts/state).
@@ -69,7 +185,7 @@ A React + TypeScript SPA that provides:
 
 ## Project Structure
 
-```
+```text
 loan-drawdown-agent-demo/
 ├── app/
 │   ├── main.py                                  # FastAPI backend server
@@ -122,94 +238,6 @@ loan-drawdown-agent-demo/
 └── .env example                                  # Template for environment variables
 ```
 
-## Requirements
-
-Before you begin, ensure you have:
-
-- **uv**: Python package manager - [Install](https://docs.astral.sh/uv/getting-started/installation/)
-- **Node.js** (v18+): For the frontend and Firebase CLI - [Install](https://nodejs.org/)
-- **Google Cloud SDK**: For GCP services - [Install](https://cloud.google.com/sdk/docs/install)
-- **make**: Build automation tool (pre-installed on most Unix-based systems)
-
-Run `make install` to install all dependencies (Python, frontend npm packages, and Firebase CLI).
-
-## Configuration
-
-### Environment Setup
-
-All configuration is managed through a central `.env` file in the root directory. The `Makefile` and backend server will automatically read these values.
-
-Copy the environment template to get started:
-
-```bash
-cp ".env example" .env
-```
-
-| Variable | Description |
-| --- | --- |
-| `GOOGLE_GENAI_USE_VERTEXAI` | Set to `TRUE` to use Vertex AI |
-| `GOOGLE_CLOUD_PROJECT` | Your GCP project ID (e.g. `my-gcp-project`) |
-| `GOOGLE_CLOUD_PROJECT_NUMBER` | Your GCP project number (e.g. `123456789012`) |
-| `GOOGLE_CLOUD_LOCATION` | GCP region (e.g. `europe-west3`) |
-| `ARTIFACTS_BUCKET` | GCS bucket for artifacts (e.g. `my-artifacts-bucket`) |
-| `MODEL_NAME` | Gemini model to use (e.g. `gemini-2.5-flash`) |
-| `FIREBASE_API_KEY` | Firebase API key (from Firebase Console) |
-| `FIREBASE_APP_ID` | Firebase web app ID (from Firebase Console) |
-
-*(Note: Additional derived variables like `SERVICE_ACCOUNT` or `FIREBASE_AUTH_DOMAIN` are handled automatically by the Makefile.)*
-
-### Firebase Authentication Setup
-
-The frontend uses Firebase Authentication for user sign-in. Follow these steps to configure it:
-
-1. **Enable Firebase for your GCP project:**
-
-   ```bash
-   make setup-firebase
-   ```
-
-   This logs into Firebase and enables it for your project. It will then print the remaining manual steps.
-
-2. **Enable Authentication providers** in the [Firebase Console](https://console.firebase.google.com):
-   - Go to **Authentication** > **Sign-in method**
-   - Enable **Email/Password**
-   - Enable **Google**
-
-3. **Add authorized domains:**
-   - Go to **Authentication** > **Settings** > **Authorized domains**
-   - `localhost` is already listed (for local development)
-   - For Cloud Run deployment, add your service domain, e.g.:
-     `<service-name>-<project-number>.<region>.run.app`
-
-4. **Register a web app and get SDK config:**
-   - Go to **Project Settings** > **General** > **Your apps**
-   - Click **Add app** > **Web** (</> icon)
-   - Register the app (no need to set up Firebase Hosting)
-   - Copy the `FIREBASE_API_KEY` and `FIREBASE_APP_ID` values into your **`.env`** file.
-
-5. **Generate the frontend environment file:**
-
-   ```bash
-   make frontend-env
-   ```
-
-   This creates `frontend/.env` from the Makefile Firebase variables. You can also copy the template manually with `cp "frontend/.env template" frontend/.env` and fill in the values.
-
-## Quick Start
-
-```bash
-make install    # Install all dependencies (Python, npm, Firebase CLI)
-make auth       # Authenticate with Google Cloud
-make playground # Launch local ADK playground (no frontend)
-```
-
-To run the full app (backend + frontend):
-
-```bash
-make local-backend          # Start FastAPI backend (port 8000)
-cd frontend && npm run dev  # Start Vite dev server (port 5173, proxies /api to backend)
-```
-
 ## Commands
 
 | Command               | Description                                          |
@@ -219,6 +247,7 @@ cd frontend && npm run dev  # Start Vite dev server (port 5173, proxies /api to 
 | `make setup-apis`     | Enable required GCP APIs                             |
 | `make setup-sa`       | Create Cloud Run service account with roles          |
 | `make setup-firebase` | Initialize Firebase and print setup instructions     |
+| `make agent-env`      | Generate root `.env` for ADK agents                  |
 | `make frontend-env`   | Generate `frontend/.env` from Makefile variables     |
 | `make playground`     | Launch local ADK playground                          |
 | `make local-backend`  | Launch FastAPI server with hot-reload                |
@@ -241,7 +270,7 @@ make setup-sa        # Create service account (first time only)
 make deploy          # Build frontend and deploy to Cloud Run
 ```
 
-After deploying, remember to add your Cloud Run domain to Firebase's authorized domains (see [Firebase Authentication Setup](#firebase-authentication-setup) step 3).
+After deploying, remember to add your Cloud Run domain to Firebase's authorized domains (see [Setup step 6c](#6-set-up-firebase-authentication-for-the-frontend)).
 
 ## Observability
 
