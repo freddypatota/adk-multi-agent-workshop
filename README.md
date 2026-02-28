@@ -34,8 +34,8 @@ Open the [Makefile](Makefile) and update the variables at the top with your proj
 | `PROJECT_LOCATION` | Your GCP region (e.g. `europe-west4`) |
 | `DOMAIN` | Authorized domain for IAP access (e.g. `example.com`) |
 | `ARTIFACTS_BUCKET` | GCS bucket for artifacts (e.g. `my-artifacts-bucket`) |
-| `FIREBASE_API_KEY` | Firebase API key (from Firebase Console — see step 5) |
-| `FIREBASE_APP_ID` | Firebase web app ID (from Firebase Console — see step 5) |
+| `FIREBASE_API_KEY`| Firebase API key (optional for the workshop, get it from Firebase Console — see step 5) |
+| `FIREBASE_APP_ID` | Firebase web app ID (optional for the workshop, get it from Firebase Console — see step 5) |
 
 The remaining variables (`SERVICE_ACCOUNT`, `SERVICE_URL`, `FIREBASE_AUTH_DOMAIN`, etc.) are derived automatically.
 
@@ -274,4 +274,4 @@ After deploying, remember to add your Cloud Run domain to Firebase's authorized 
 
 ## Observability
 
-The application exports telemetry to [Cloud Trace](https://docs.cloud.google.com/trace/docs/overview?_gl=1*qcsa2e*_up*MQ..&gclid=Cj0KCQiAwYrNBhDcARIsAGo3u323GIq0aq3flbPapFIJ2QkNhfLaSxFiQo9dd1ibvwC4mIjuvc42pXcaAt7yEALw_wcB&gclsrc=aw.ds) via OpenTelemetry. Traces for agent invocations, tool calls, and LLM requests are available in the Google Cloud Console.
+The application exports telemetry to [Cloud Trace](https://docs.cloud.google.com/trace/docs/overview) via OpenTelemetry. Traces for agent invocations, tool calls, and LLM requests are available in the Google Cloud Console.
