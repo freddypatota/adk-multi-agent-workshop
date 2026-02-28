@@ -26,15 +26,6 @@ def get_financial_context(client_id: str, invoice_amount: float, currency: str) 
     # 4. Calculate remaining limit: approved_limit - current_exposure
     # 5. Check if within limit: remaining_limit >= converted_amount
     # 6. Return a dict with all the financial context fields
-    #
-    # Hint:
-    #   exposure_data = george_service.get_client_exposure(client_id)
-    #   rate = ibh_service.get_rate(currency, exposure_data["currency"])
-    #   converted_amount = invoice_amount * rate
-    #   approved = exposure_data["approved_limit"]
-    #   current = exposure_data["current_exposure"]
-    #   remaining = approved - current
-    #   is_within = remaining >= converted_amount
-    #   return {"client_id": client_id, "currency": exposure_data["currency"], ...}
+
 
     pass  # Replace with your implementation

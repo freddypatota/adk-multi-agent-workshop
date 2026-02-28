@@ -20,12 +20,5 @@ def check_sanctions(vendor_name: str) -> dict:
     # 3. If found, set status to "FAIL" and add a flag message
     # 4. If not found, set status to "PASS"
     # 5. Return a dict with: check_name, status, flags, reason
-    #
-    # Hint:
-    #   flags = []
-    #   if vendor_name.strip().lower() in SANCTIONS_LIST:
-    #       flags.append(f"Vendor '{vendor_name}' is on the Sanctions List.")
-    #   status = "FAIL" if flags else "PASS"
-    #   return {"check_name": "Sanctions", "status": status, "flags": flags, "reason": "..."}
 
     pass  # Replace with your implementation
