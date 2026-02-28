@@ -18,25 +18,9 @@ async def file_upload_callback(callback_context: CallbackContext) -> None:
     # 3. Check each part in event.content.parts for inline_data or file_data
     # 4. For inline_data: get display_name and mime_type, add to files list
     # 5. Break after processing the latest user event
-    #
-    # Hint:
-    #   for event in reversed(callback_context.session.events):
-    #       if getattr(event, "author", "") == "user":
-    #           if getattr(event, "content", None):
-    #               for part in getattr(event.content, "parts", []):
-    #                   if getattr(part, "inline_data", None):
-    #                       display_name = getattr(part.inline_data, "display_name", "file")
-    #                       mime_type = getattr(part.inline_data, "mime_type", "unknown")
-    #                       files.append(f"'{display_name}' type: {mime_type}")
-    #           break
-
+  
     # TODO(workshop): Update session state with file info.
     # Only update when files are found (to preserve state from earlier uploads).
-    #
-    # Hint:
-    #   if len(files) > 0:
-    #       callback_context.state["has_uploaded_file"] = True
-    #       callback_context.state["uploaded_file_details"] = files
 
     # Set default client_id for the demo
     if "client_id" not in callback_context.state:
