@@ -2,43 +2,25 @@
 # Variables
 # ==============================================================================
 
-# Load environment variables from .env
-ifneq (,$(wildcard ./.env))
-    include .env
-    export
-endif
-
-# Clean quotes from .env variables
-ENV_PROJECT_ID := $(patsubst "%",%,$(GOOGLE_CLOUD_PROJECT))
-ENV_PROJECT_NUMBER := $(patsubst "%",%,$(if $(GOOGLE_CLOUD_PROJECT_NUMBER),$(GOOGLE_CLOUD_PROJECT_NUMBER),$(PROJECT_NUMBER)))
-ENV_LOCATION   := $(patsubst "%",%,$(GOOGLE_CLOUD_LOCATION))
-ENV_MODEL_NAME := $(patsubst "%",%,$(MODEL_NAME))
-ENV_ARTIFACTS_BUCKET := $(patsubst "%",%,$(ARTIFACTS_BUCKET))
-
-# Firebase Config - can be set in .env
-ENV_FIREBASE_API_KEY := $(patsubst "%",%,$(FIREBASE_API_KEY))
-ENV_FIREBASE_APP_ID  := $(patsubst "%",%,$(FIREBASE_APP_ID))
-
-# GCP Project Configuration
-
-PROJECT_ID       := $(if $(ENV_PROJECT_ID),$(ENV_PROJECT_ID),[Your GCP project ID, e.g. my-gcp-project])
-PROJECT_NUMBER   := $(if $(ENV_PROJECT_NUMBER),$(ENV_PROJECT_NUMBER),[Your GCP project number, e.g. 123456789012])
-PROJECT_LOCATION := $(if $(ENV_LOCATION),$(ENV_LOCATION),[Your GCP region, e.g. europe-west4])
-DOMAIN           ?= [Your authorized domain for IAP, e.g. example.com]
-MODEL_NAME       := $(if $(ENV_MODEL_NAME),$(ENV_MODEL_NAME),gemini-2.5-flash)
-ARTIFACTS_BUCKET := $(if $(ENV_ARTIFACTS_BUCKET),$(ENV_ARTIFACTS_BUCKET),[Your GCS bucket for artifacts, e.g. my-artifacts-bucket])
+# GCP Project Configuration — update these for your project
+PROJECT_ID       := [Your GCP project ID, e.g. my-gcp-project]
+PROJECT_NUMBER   := [Your GCP project number, e.g. 123456789012]
+PROJECT_LOCATION := [Your GCP region, e.g. europe-west4]
+DOMAIN           := [Your authorized domain for IAP, e.g. example.com]
+MODEL_NAME       := gemini-2.5-flash
+ARTIFACTS_BUCKET := [Your GCS bucket for artifacts, e.g. my-artifacts-bucket]
 SERVICE_NAME     := loan-drawdown-adk
 SERVICE_ACCOUNT  := $(SERVICE_NAME)-sa@$(PROJECT_ID).iam.gserviceaccount.com
 SERVICE_ACCOUNT_DISPLAY_NAME := 'Loan Drawdown Agent Cloud Run Service Account'
 SERVICE_URL      := https://$(SERVICE_NAME)-$(PROJECT_NUMBER).$(PROJECT_LOCATION).run.app
 
 # Firebase Configuration — update these for your Firebase project
-FIREBASE_API_KEY             := $(if $(ENV_FIREBASE_API_KEY),$(ENV_FIREBASE_API_KEY),[Your Firebase API key, e.g. AIzaSy...])
+FIREBASE_API_KEY             := [Your Firebase API key, e.g. AIzaSy...]
 FIREBASE_AUTH_DOMAIN         := $(PROJECT_ID).firebaseapp.com
 FIREBASE_PROJECT_ID          := $(PROJECT_ID)
 FIREBASE_STORAGE_BUCKET      := $(PROJECT_ID).firebasestorage.app
 FIREBASE_MESSAGING_SENDER_ID := $(PROJECT_NUMBER)
-FIREBASE_APP_ID              := $(if $(ENV_FIREBASE_APP_ID),$(ENV_FIREBASE_APP_ID),[Your Firebase app ID, e.g. 1:123456789012:web:abc123])
+FIREBASE_APP_ID              := [Your Firebase app ID, e.g. 1:123456789012:web:abc123]
 
 # ==============================================================================
 # Installation & Setup
