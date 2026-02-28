@@ -135,36 +135,28 @@ Run `make install` to install all dependencies (Python, frontend npm packages, a
 
 ## Configuration
 
-### Makefile Variables
+### Environment Setup
 
-Before running any commands, update the variables at the top of the [Makefile](Makefile) with your project details:
+All configuration is managed through a central `.env` file in the root directory. The `Makefile` and backend server will automatically read these values.
 
-| Variable | Description |
-| --- | --- |
-| `PROJECT_ID` | Your GCP project ID (e.g. `my-gcp-project`) |
-| `PROJECT_NUMBER` | Your GCP project number (e.g. `123456789012`) |
-| `PROJECT_LOCATION` | Your GCP region (e.g. `europe-west4`) |
-| `DOMAIN` | Authorized domain for IAP access (e.g. `example.com`) |
-| `ARTIFACTS_BUCKET` | GCS bucket for artifacts (e.g. `my-artifacts-bucket`) |
-| `FIREBASE_API_KEY` | Firebase API key (from Firebase Console) |
-| `FIREBASE_APP_ID` | Firebase web app ID (from Firebase Console) |
-
-The remaining Makefile variables (`SERVICE_ACCOUNT`, `SERVICE_URL`, `FIREBASE_AUTH_DOMAIN`, etc.) are derived automatically from these.
-
-### Backend
-
-Copy the environment template and fill in your GCP project details:
+Copy the environment template to get started:
 
 ```bash
 cp ".env example" .env
 ```
 
-| Variable                     | Description                                    |
-| ---------------------------- | ---------------------------------------------- |
-| `GOOGLE_GENAI_USE_VERTEXAI`  | Set to `TRUE` to use Vertex AI                 |
-| `GOOGLE_CLOUD_PROJECT`       | Your GCP project ID                            |
-| `GOOGLE_CLOUD_LOCATION`      | GCP region (e.g. `europe-west4`)               |
-| `MODEL_NAME`                 | Gemini model to use (e.g. `gemini-2.5-flash`)  |
+| Variable | Description |
+| --- | --- |
+| `GOOGLE_GENAI_USE_VERTEXAI` | Set to `TRUE` to use Vertex AI |
+| `GOOGLE_CLOUD_PROJECT` | Your GCP project ID (e.g. `my-gcp-project`) |
+| `GOOGLE_CLOUD_PROJECT_NUMBER` | Your GCP project number (e.g. `123456789012`) |
+| `GOOGLE_CLOUD_LOCATION` | GCP region (e.g. `europe-west3`) |
+| `ARTIFACTS_BUCKET` | GCS bucket for artifacts (e.g. `my-artifacts-bucket`) |
+| `MODEL_NAME` | Gemini model to use (e.g. `gemini-2.5-flash`) |
+| `FIREBASE_API_KEY` | Firebase API key (from Firebase Console) |
+| `FIREBASE_APP_ID` | Firebase web app ID (from Firebase Console) |
+
+*(Note: Additional derived variables like `SERVICE_ACCOUNT` or `FIREBASE_AUTH_DOMAIN` are handled automatically by the Makefile.)*
 
 ### Firebase Authentication Setup
 
@@ -193,7 +185,7 @@ The frontend uses Firebase Authentication for user sign-in. Follow these steps t
    - Go to **Project Settings** > **General** > **Your apps**
    - Click **Add app** > **Web** (</> icon)
    - Register the app (no need to set up Firebase Hosting)
-   - Copy the `FIREBASE_API_KEY` and `FIREBASE_APP_ID` values into the [Makefile variables](#makefile-variables)
+   - Copy the `FIREBASE_API_KEY` and `FIREBASE_APP_ID` values into your **`.env`** file.
 
 5. **Generate the frontend environment file:**
 
