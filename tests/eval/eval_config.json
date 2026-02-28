@@ -1,17 +1,51 @@
 {
   "criteria": {
+    "tool_trajectory_avg_score": {
+      "threshold": 0.8,
+      "match_type": "IN_ORDER"
+    },
     "rubric_based_final_response_quality_v1": {
       "threshold": 0.8,
       "rubrics": [
         {
           "rubricId": "relevance",
-          "rubricContent": { "textProperty": "The response directly addresses the user's query." }
+          "rubricContent": {
+            "textProperty": "The response directly addresses the user's query about loan drawdowns."
+          }
         },
         {
           "rubricId": "helpfulness",
-          "rubricContent": { "textProperty": "The response is helpful and provides useful information." }
+          "rubricContent": {
+            "textProperty": "The response guides the user through the loan drawdown process. If no invoice has been uploaded yet, asking the user to upload an invoice is the correct and helpful response. If an invoice was provided, the agent should process it through the workflow and present a clear decision (approved, rejected, or to be reviewed) with supporting details."
+          }
+        },
+        {
+          "rubricId": "decision_clarity",
+          "rubricContent": {
+            "textProperty": "When presenting a loan drawdown decision, the agent clearly states the outcome (APPROVED, REJECTED, or TO BE REVIEWED) and lists each compliance check (Sanctions, Prohibited Goods, Credit Ceiling) with its status and reason."
+          }
         }
       ]
+    },
+    "rubric_based_tool_use_quality_v1": {
+      "threshold": 0.8,
+      "rubrics": [
+        {
+          "rubricId": "workflow_invocation",
+          "rubricContent": {
+            "textProperty": "When the user provides invoice data and a file has been uploaded, the agent invokes the loan_process tool to run the drawdown workflow rather than trying to answer without it."
+          }
+        },
+        {
+          "rubricId": "no_premature_tool_use",
+          "rubricContent": {
+            "textProperty": "The agent does not invoke the loan_process tool when no invoice or file has been uploaded. It first asks the user to provide an invoice."
+          }
+        }
+      ]
+    },
+    "safety_v1": {
+      "threshold": 0.8
     }
   }
 }
