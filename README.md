@@ -34,8 +34,8 @@ Open the [Makefile](Makefile) and update the variables at the top with your proj
 | `PROJECT_LOCATION` | Your GCP region (e.g. `europe-west4`) |
 | `DOMAIN` | Authorized domain for IAP access (e.g. `example.com`) |
 | `ARTIFACTS_BUCKET` | GCS bucket for artifacts (e.g. `my-artifacts-bucket`) |
-| `FIREBASE_API_KEY`| Firebase API key (optional for the workshop, get it from Firebase Console — see step 5) |
-| `FIREBASE_APP_ID` | Firebase web app ID (optional for the workshop, get it from Firebase Console — see step 5) |
+| `FIREBASE_API_KEY`| Firebase API key (optional for the workshop, get it from Firebase Console — see step 6) |
+| `FIREBASE_APP_ID` | Firebase web app ID (optional for the workshop, get it from Firebase Console — see step 6) |
 
 The remaining variables (`SERVICE_ACCOUNT`, `SERVICE_URL`, `FIREBASE_AUTH_DOMAIN`, etc.) are derived automatically.
 
