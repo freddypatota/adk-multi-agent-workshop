@@ -32,7 +32,11 @@ agent = Agent(
 
 ### Why File Injection is Needed
 
-When the root agent delegates to `loan_process` via `AgentTool`, the sub-agents run in a scoped context. They can't directly see the file content from the original user message. The `inject_invoice_content` callback bridges this gap by loading the file and adding it to the extraction agent's LLM request.
+If you noticed at the end of Step 4, your extracted invoice indicated missing data! 
+
+When the root agent delegates to `loan_process` via an `AgentTool` (instead of `sub_agents` handoff), the tool acts like an opaque backend function call. The sub-agents inside it run in a scoped context and they can't directly see the raw image/PDF file attached in the original user chat message. They only "knew" it was uploaded.
+
+The `inject_invoice_content` callback bridges this gap. It intercepts the HTTP request *right before* it hits the Extraction Agent's LLM, takes the physical file bytes we saved in state/artifacts during upload, and injects them directly into the context length so the model can actually "see" the PDF and pull real data.
 
 ### Artifact vs State Fallback
 
@@ -88,7 +92,16 @@ The prompts need to tell each agent to process **all** invoices (not just one). 
 
 ### 6. Test with the frontend
 
-The frontend is pre-built. Run both backend and frontend:
+**Congratulations! You've finished the agentic part of the workshop! 🎉**
+
+Now we will test the complete application using the pre-built React frontend. 
+
+> **Important Prerequisites:**
+> - Ensure you have run `make setup-firebase` as described in the root README.
+> - Ensure your root `.env` (or the `Makefile` variables) contains your `FIREBASE_API_KEY`, `FIREBASE_APP_ID`, and `PROJECT_ID`.
+> - Run `make frontend-env` to generate the `.env` file that the React frontend needs.
+
+Run both the backend and frontend in separate tabs:
 
 ```bash
 # Terminal 1

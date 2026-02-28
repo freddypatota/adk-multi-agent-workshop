@@ -2,10 +2,6 @@ from google.adk.agents import Agent
 
 from .config.constants import MODEL_NAME
 
-# TODO(workshop): Import your tool functions from .tools.compliance_tools and .tools.financial_tools
-# Hint: from .tools.compliance_tools import check_sanctions
-#       from .tools.financial_tools import get_financial_context
-
 INSTRUCTION = """
 You are the Loan Drawdown Assistant.
 Your role is to help users evaluate loan drawdown requests.
@@ -23,16 +19,9 @@ Rules:
 
 # TODO(workshop): Add your tools to the Agent.
 # Add a `tools` parameter with a list of your tool functions.
-#
-# Hint: root_agent = Agent(
-#     name="loan_drawdown_agent",
-#     model=MODEL_NAME,
-#     instruction=INSTRUCTION,
-#     tools=[check_sanctions, get_financial_context],
-# )
 root_agent = Agent(
     name="loan_drawdown_agent",
     model=MODEL_NAME,
     instruction=INSTRUCTION,
-    # TODO(workshop): Add tools=[...] here
+    tools=[check_sanctions, get_financial_context],
 )

@@ -116,7 +116,7 @@ playground:
 ifdef STEP
 	@echo "| Workshop step: $(STEP)"
 	@echo "==============================================================================="
-	uv run adk web steps/$(STEP)/ --port 8501 --reload_agents
+	uv run adk web steps/$(STEP)/agents/ --port 8501 --reload_agents
 else
 	uv run adk web app/agents/ --port 8501 --reload_agents --no_use_local_storage
 endif

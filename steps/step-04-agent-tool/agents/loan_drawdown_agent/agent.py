@@ -1,10 +1,8 @@
 from google.adk.agents import Agent, ParallelAgent, SequentialAgent
 
-# TODO(workshop): Import AgentTool
-# Hint: from google.adk.tools.agent_tool import AgentTool
+from google.adk.tools.agent_tool import AgentTool
 
-# TODO(workshop): Import file_upload_callback
-# Hint: from .callbacks.file_upload_callback import file_upload_callback
+from .callbacks.file_upload_callback import file_upload_callback
 
 from .config.constants import MODEL_NAME
 from .config.prompts import ROOT_ORCHESTRATOR_INSTRUCTION
@@ -29,7 +27,7 @@ loan_process = SequentialAgent(
 # Change it to tools=[AgentTool(agent=loan_process)] so the root agent
 # controls when to invoke the workflow (only after a file is uploaded).
 #
-# Also add: before_agent_callback=file_upload_callback
+# Also add: the appropriate callback to the root agent.
 #
 # Key difference:
 #   sub_agents = agent transfer (automatic delegation)

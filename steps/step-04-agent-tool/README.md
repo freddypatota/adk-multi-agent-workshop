@@ -90,6 +90,12 @@ Try:
 - State shows `has_uploaded_file: True` after upload
 - The workflow runs via tool call, not automatic delegation
 
+
+> **Wait, why did the extraction return missing data?**
+> If you look closely at the workflow results, you might notice that the extracted invoice data contains missing values! 
+> 
+> Here is the reason: In this step, the `loan_process` is executed as a **tool**. The Root Agent passes textual state to the tool, but **it does not pass the physical file bytes**. The Extraction Agent knows a file *exists* (because we saved the name in the state), but it runs blind and can't actually "see" the PDF, resulting in empty data. We will fix this "blindness" in Step 5 using Injection!
+
 ## Solution
 
 See `solutions/step-04/` for the complete working code.
