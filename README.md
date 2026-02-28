@@ -20,6 +20,8 @@ This branch contains a hands-on workshop that guides you through building the lo
 
 ```bash
 make install                                    # First time: install all dependencies
+cp ".env example" .env                          # First time: create .env and fill in your project details
+make auth                                       # First time: authenticate with Google Cloud
 make playground STEP=step-01-first-agent        # Run any step in the playground
 ```
 
@@ -251,4 +253,4 @@ After deploying, remember to add your Cloud Run domain to Firebase's authorized 
 
 ## Observability
 
-The application exports telemetry to [Cloud Trace](https://console.cloud.google.com/traces) via OpenTelemetry. Traces for agent invocations, tool calls, and LLM requests are available in the Google Cloud Console.
+The application exports telemetry to [Cloud Trace](https://docs.cloud.google.com/trace/docs/overview?_gl=1*qcsa2e*_up*MQ..&gclid=Cj0KCQiAwYrNBhDcARIsAGo3u323GIq0aq3flbPapFIJ2QkNhfLaSxFiQo9dd1ibvwC4mIjuvc42pXcaAt7yEALw_wcB&gclsrc=aw.ds) via OpenTelemetry. Traces for agent invocations, tool calls, and LLM requests are available in the Google Cloud Console.
