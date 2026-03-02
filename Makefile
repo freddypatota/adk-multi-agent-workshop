@@ -234,3 +234,28 @@ lint:
 	uv run ruff check . --diff
 	uv run ruff format . --check --diff
 	uv run ty check .
+
+# ==============================================================================
+# Windows Targets (PowerShell)
+# ==============================================================================
+# These targets use PowerShell and are intended for Windows users.
+# Usage: make install-win, make agent-env-win, etc.
+# Prerequisites: PowerShell 5+, uv, Node.js, gcloud CLI installed.
+
+install-win:
+	@powershell -Command "if (-not (Get-Command uv -ErrorAction SilentlyContinue)) { Write-Host 'Installing uv...'; irm https://astral.sh/uv/install.ps1 | iex }"
+	uv sync
+	npm --prefix frontend install
+	@powershell -Command "if (-not (Get-Command firebase -ErrorAction SilentlyContinue)) { npm install -g firebase-tools }"
+
+agent-env-win:
+	@powershell -Command "Set-Content -Path .env -Value @('GOOGLE_GENAI_USE_VERTEXAI=\"TRUE\"','GOOGLE_CLOUD_PROJECT=\"$(PROJECT_ID)\"','GOOGLE_CLOUD_LOCATION=\"$(PROJECT_LOCATION)\"','MODEL_NAME=\"$(MODEL_NAME)\"'); Write-Host 'Generated .env'"
+
+frontend-env-win:
+	@powershell -Command "Set-Content -Path frontend/.env -Value @('VITE_FIREBASE_API_KEY=$(FIREBASE_API_KEY)','VITE_FIREBASE_AUTH_DOMAIN=$(FIREBASE_AUTH_DOMAIN)','VITE_FIREBASE_PROJECT_ID=$(FIREBASE_PROJECT_ID)','VITE_FIREBASE_STORAGE_BUCKET=$(FIREBASE_STORAGE_BUCKET)','VITE_FIREBASE_MESSAGING_SENDER_ID=$(FIREBASE_MESSAGING_SENDER_ID)','VITE_FIREBASE_APP_ID=$(FIREBASE_APP_ID)'); Write-Host 'Generated frontend/.env'"
+
+clean-win:
+	@powershell -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue .mypy_cache, .ruff_cache, .pytest_cache; Get-ChildItem -Recurse -Directory -Filter '__pycache__' | Remove-Item -Recurse -Force"
+
+kill-win:
+	@powershell -Command "8000,8001,8002,8003,8004,8080,8501 | ForEach-Object { Get-NetTCPConnection -LocalPort $$_ -ErrorAction SilentlyContinue } | ForEach-Object { Stop-Process -Id $$_.OwningProcess -Force -ErrorAction SilentlyContinue }"

@@ -259,6 +259,8 @@ loan-drawdown-agent-demo/
 | `make clean`          | Remove temporary files and caches                    |
 | `make kill`           | Kill local development processes on common ports     |
 
+**Windows users:** For commands that use shell-specific syntax (`install`, `agent-env`, `frontend-env`, `clean`, `kill`), use the `-win` suffix (e.g., `make install-win`). These use PowerShell instead of bash. Commands like `auth`, `playground`, `local-backend`, `test`, `eval`, and `lint` work on both platforms as-is.
+
 For full command options, refer to the [Makefile](Makefile).
 For evaluation set format and usage, see the [evalsets guide](tests/eval/evalsets/README.md).
 
