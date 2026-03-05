@@ -108,6 +108,8 @@ Setup is complete. Time to build your first agent.
 
 ## Step 1: Your First Agent - Concepts
 
+<walkthrough-info-message>Solution: `solutions/step-01/`</walkthrough-info-message>
+
 **Learning objectives:**
 - Understand the basic structure of an ADK agent
 - Create an `Agent` with a name, model, and instruction
@@ -195,20 +197,29 @@ Click the <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Pr
 
 Try these prompts:
 
-- "Hello" &mdash; the agent should greet you
-- "I want to process a loan drawdown" &mdash; the agent should ask for an invoice
-- "What can you do?" &mdash; the agent should explain its capabilities
+```
+Hello
+```
+
+```
+I want to process a loan drawdown
+```
+
+```
+What can you do?
+```
 
 ### Checkpoint
 
-When done correctly:
 - The playground loads without errors
 - The agent responds conversationally about loan drawdowns
 - The agent asks you to upload an invoice when appropriate
 
-<walkthrough-info-message>If you get stuck, check `solutions/step-01/` for the complete working code.</walkthrough-info-message>
+Press **Ctrl+C** in the terminal to stop the playground before moving on.
 
 ## Step 2: Tools & Structured Output - Concepts
+
+<walkthrough-info-message>Solution: `solutions/step-02/`</walkthrough-info-message>
 
 **Learning objectives:**
 - Create function tools that agents can call
@@ -381,9 +392,21 @@ make playground STEP=step-02-tools
 
 Use <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview** on port 8501 and try these prompts:
 
-- "Check if 'Acme Corp' is sanctioned" &mdash; should return PASS
-- "Check if 'BadActor Corp' is sanctioned" &mdash; should return FAIL
-- "Check credit for client demo_client_001 with amount 50000 EUR" &mdash; should call get_financial_context
+```
+Check if 'Acme Corp' is sanctioned
+```
+
+Expected: PASS
+
+```
+Check if 'BadActor Corp' is sanctioned
+```
+
+Expected: FAIL
+
+```
+Check credit for client demo_client_001 with amount 50000 EUR
+```
 
 ### Checkpoint
 
@@ -391,9 +414,11 @@ Use <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview*
 - Sanctions check correctly identifies sanctioned vendors
 - Financial context returns meaningful limit and conversion data
 
-<walkthrough-info-message>If you get stuck, check `solutions/step-02/` for the complete working code.</walkthrough-info-message>
+Press **Ctrl+C** in the terminal to stop the playground before moving on.
 
 ## Step 3: Multi-Agent Workflow - Concepts
+
+<walkthrough-info-message>Solution: `solutions/step-03/`</walkthrough-info-message>
 
 **Learning objectives:**
 - Break a monolithic agent into specialized sub-agents
@@ -613,7 +638,11 @@ root_agent = Agent(
 make playground STEP=step-03-multi-agent
 ```
 
-Use <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview** on port 8501 and try: "Process a loan drawdown for vendor 'Acme Corp', invoice #123, amount 50000 EUR, items: Office Supplies x10 at 5000 each, client demo_client_001"
+Use <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview** on port 8501 and try:
+
+```
+Process a loan drawdown for vendor 'Acme Corp', invoice #123, amount 50000 EUR, items: Office Supplies x10 at 5000 each, client demo_client_001
+```
 
 ### Checkpoint
 
@@ -621,9 +650,11 @@ Use <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview*
 - Each agent produces structured output stored in state
 - The root agent summarizes the final decision
 
-<walkthrough-info-message>If you get stuck, check `solutions/step-03/` for the complete working code.</walkthrough-info-message>
+Press **Ctrl+C** in the terminal to stop the playground before moving on.
 
 ## Step 4: AgentTool & Callbacks - Concepts
+
+<walkthrough-info-message>Solution: `solutions/step-04/`</walkthrough-info-message>
 
 **Learning objectives:**
 - Understand the difference between `sub_agents` and `AgentTool`
@@ -736,9 +767,15 @@ make playground STEP=step-04-agent-tool
 
 Use <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview** on port 8501 and try:
 
-- "Hello" &mdash; agent greets you and asks for an invoice
-- Upload a file &mdash; agent should detect it and offer to process
-- "Process the loan" &mdash; agent calls loan_process tool
+```
+Hello
+```
+
+Then upload a file, and send:
+
+```
+Process the loan
+```
 
 ### Checkpoint
 
@@ -748,9 +785,11 @@ Use <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview*
 
 <walkthrough-info-message>Notice the extraction may return missing data! The sub-agents can't "see" the actual file bytes when called via AgentTool. You fix this in Step 5.</walkthrough-info-message>
 
-<walkthrough-info-message>If you get stuck, check `solutions/step-04/` for the complete working code.</walkthrough-info-message>
+Press **Ctrl+C** in the terminal to stop the playground before moving on.
 
 ## Step 5: File Handling - Concepts
+
+<walkthrough-info-message>Solution: `solutions/step-05/`</walkthrough-info-message>
 
 **Learning objectives:**
 - Use `before_model_callback` to modify the LLM request before it's sent
@@ -923,8 +962,6 @@ Use <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview*
 - Uploading an invoice extracts real data (not hallucinated)
 - All workflow stages complete: extraction, sanctions, prohibited goods, credit ceiling, decision
 - Uploading multiple invoices produces per-invoice results with batch schemas
-
-<walkthrough-info-message>If you get stuck, check `solutions/step-05/` for the complete working code. The final application is in `app/`.</walkthrough-info-message>
 
 ## Congratulations
 
