@@ -26,26 +26,36 @@ By the end, you will have:
 
 Click **Start** to begin.
 
-## Project setup
+## Select your project
 
-<walkthrough-project-setup billing="true"></walkthrough-project-setup>
+<walkthrough-project-setup></walkthrough-project-setup>
 
-First, set your project ID and region as environment variables.
+Select your GCP project above, then run the following to configure the Makefile automatically:
 
 ```bash
 export PROJECT_ID=<walkthrough-project-id/>
+export PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
+```
+
+## Select your region
+
+Choose a region that supports Vertex AI (e.g., `us-central1`, `europe-west4`):
+
+```bash
 export PROJECT_LOCATION=europe-west4
 ```
 
-Update the Makefile variables with your project details.
+## Configure the Makefile
 
-<walkthrough-editor-open-file filePath="Makefile">Open the Makefile</walkthrough-editor-open-file>
+This writes your project settings into the Makefile so all `make` commands use the correct values:
 
-Replace the placeholder values at the top:
+```bash
+sed -i "s|^PROJECT_ID.*|PROJECT_ID       := $PROJECT_ID|" Makefile
+sed -i "s|^PROJECT_NUMBER.*|PROJECT_NUMBER   := $PROJECT_NUMBER|" Makefile
+sed -i "s|^PROJECT_LOCATION.*|PROJECT_LOCATION := $PROJECT_LOCATION|" Makefile
+```
 
-- `PROJECT_ID` with your GCP project ID
-- `PROJECT_NUMBER` with your GCP project number
-- `PROJECT_LOCATION` with your preferred region (e.g., `europe-west4`)
+<walkthrough-editor-open-file filePath="Makefile">Verify the Makefile</walkthrough-editor-open-file>
 
 ## Install dependencies
 
