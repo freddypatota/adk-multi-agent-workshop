@@ -28,26 +28,27 @@ Click **Start** to begin.
 
 ## Configure your project
 
-Set your GCP project ID and region. Replace the values below with your own:
+Enter your GCP project ID:
 
-```bash
-export PROJECT_ID=your-project-id
-export PROJECT_LOCATION=europe-west4
-```
+<walkthrough-watcher-constant key="PROJECT_ID" value="your-project-id"></walkthrough-watcher-constant>
+
+Choose a region that supports Vertex AI (e.g., `us-central1`, `europe-west4`):
+
+<walkthrough-watcher-constant key="PROJECT_LOCATION" value="europe-west4"></walkthrough-watcher-constant>
 
 Set the project and retrieve its number:
 
 ```bash
-gcloud config set project $PROJECT_ID
-export PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
+gcloud config set project {{PROJECT_ID}}
+export PROJECT_NUMBER=$(gcloud projects describe {{PROJECT_ID}} --format="value(projectNumber)")
 ```
 
 Now write these values into the Makefile so all `make` commands use them:
 
 ```bash
-sed -i "s|^PROJECT_ID.*|PROJECT_ID       := $PROJECT_ID|" Makefile
+sed -i "s|^PROJECT_ID.*|PROJECT_ID       := {{PROJECT_ID}}|" Makefile
 sed -i "s|^PROJECT_NUMBER.*|PROJECT_NUMBER   := $PROJECT_NUMBER|" Makefile
-sed -i "s|^PROJECT_LOCATION.*|PROJECT_LOCATION := $PROJECT_LOCATION|" Makefile
+sed -i "s|^PROJECT_LOCATION.*|PROJECT_LOCATION := {{PROJECT_LOCATION}}|" Makefile
 ```
 
 <walkthrough-editor-open-file filePath="Makefile">Verify the Makefile</walkthrough-editor-open-file>
