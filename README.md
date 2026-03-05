@@ -2,7 +2,7 @@
 
 A multi-agent demonstration project built with the [Google Cloud Agent Development Kit (ADK)](https://google.github.io/adk-docs/) for processing automated loan drawdown requests from invoices. Includes a React frontend with real-time workflow visualization.
 
-[![Open in Cloud Shell Editor](/.journey/journey.svg)](https://ide.cloud.google.com/?cloudshell_git_repo=https://github.com/freddypatota/adk-multi-agent-workshop.git&cloudshell_git_branch=main&cloudshell_tutorial=.journey/tutorial.neos.md)
+[![Open in Cloud Shell Editor](/.journey/journey.svg)](https://ide.cloud.google.com/?cloudshell_git_repo=https://github.com/freddypatota/adk-multi-agent-workshop.git&cloudshell_git_branch=main&cloudshell_workspace=.&cloudshell_tutorial=.journey/tutorial.neos.md)
 
 ## Requirements
 

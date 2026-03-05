@@ -40,20 +40,26 @@ export PROJECT_LOCATION=europe-west4
 
 ## Configure the Makefile
 
-Set your active project:
+Set your active project and retrieve its number:
 
 ```bash
 gcloud config set project <walkthrough-project-id/>
 ```
 
-To configure the Makefile with your project settings, open it in the editor and update the variables at the top:
+To look up your project number, run:
+
+```bash
+gcloud projects describe <walkthrough-project-id/> --format="value(projectNumber)"
+```
+
+Now open the Makefile in the editor and update the variables at the top with your values:
 
 <walkthrough-editor-select-line filePath="Makefile"
                               startLine="5" startCharacterOffset="0"
                               endLine="8" endCharacterOffset="0">Open the Makefile at the project variables</walkthrough-editor-select-line>
 
 - Set `PROJECT_ID` to `<walkthrough-project-id/>`
-- Set `PROJECT_NUMBER` to `<walkthrough-project-number/>`
+- Set `PROJECT_NUMBER` to the number from the command above
 - Set `PROJECT_LOCATION` to your chosen region (e.g., `europe-west4`)
 
 ## Install dependencies
