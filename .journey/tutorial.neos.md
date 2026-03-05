@@ -40,20 +40,25 @@ export PROJECT_LOCATION=europe-west4
 
 ## Configure the Makefile
 
-Set your project and write the values into the Makefile:
+Set your active project:
 
 ```bash
 gcloud config set project <walkthrough-project-id/>
-sed -i "s|^PROJECT_ID.*|PROJECT_ID       := <walkthrough-project-id/>|" Makefile
-sed -i "s|^PROJECT_NUMBER.*|PROJECT_NUMBER   := <walkthrough-project-number/>|" Makefile
-sed -i "s|^PROJECT_LOCATION.*|PROJECT_LOCATION := $PROJECT_LOCATION|" Makefile
 ```
 
-<walkthrough-editor-open-file filePath="Makefile">Verify the Makefile</walkthrough-editor-open-file>
+To configure the Makefile with your project settings, open it in the editor and update the variables at the top:
+
+<walkthrough-editor-select-line filePath="Makefile"
+                              startLine="5" startCharacterOffset="0"
+                              endLine="8" endCharacterOffset="0">Open the Makefile at the project variables</walkthrough-editor-select-line>
+
+- Set `PROJECT_ID` to `<walkthrough-project-id/>`
+- Set `PROJECT_NUMBER` to `<walkthrough-project-number/>`
+- Set `PROJECT_LOCATION` to your chosen region (e.g., `europe-west4`)
 
 ## Install dependencies
 
-Install Python packages, frontend npm packages, and the Firebase CLI.
+Install Python packages and frontend npm packages.
 
 ```bash
 make install
@@ -93,7 +98,7 @@ This creates a `.env` file at the project root with your GCP project settings.
 
 ---
 
-Setup is complete. Now let's build your first agent.
+Setup is complete. Time to build your first agent.
 
 ## Step 1: Your First Agent - Concepts
 
@@ -735,7 +740,7 @@ Use <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview*
 - State shows `has_uploaded_file: True` after upload
 - The workflow runs via tool call, not automatic delegation
 
-<walkthrough-info-message>Notice the extraction may return missing data! The sub-agents can't "see" the actual file bytes when called via AgentTool. We fix this in Step 5.</walkthrough-info-message>
+<walkthrough-info-message>Notice the extraction may return missing data! The sub-agents can't "see" the actual file bytes when called via AgentTool. You fix this in Step 5.</walkthrough-info-message>
 
 <walkthrough-info-message>If you get stuck, check `solutions/step-04/` for the complete working code.</walkthrough-info-message>
 
@@ -854,12 +859,10 @@ extraction_agent = Agent(
 
 Define 4 batch wrapper models:
 
-| Wrapper | Wraps | Field name |
-|---|---|---|
-| `InvoiceBatch` | `list[InvoiceData]` | `invoices` |
-| `ComplianceBatchResult` | `list[ComplianceCheckResult]` | `results` |
-| `FinancialBatchContext` | `list[FinancialContext]` | `results` |
-| `BatchValidationReport` | `list[ValidationReport]` | `reports` |
+- `InvoiceBatch` &mdash; wraps `list[InvoiceData]` in an `invoices` field
+- `ComplianceBatchResult` &mdash; wraps `list[ComplianceCheckResult]` in a `results` field
+- `FinancialBatchContext` &mdash; wraps `list[FinancialContext]` in a `results` field
+- `BatchValidationReport` &mdash; wraps `list[ValidationReport]` in a `reports` field
 
 <details>
 <summary><strong>Hint: batch wrapper models</strong></summary>
