@@ -28,27 +28,26 @@ Click **Start** to begin.
 
 ## Configure your project
 
-Enter your GCP project ID:
+Set your GCP project ID and region. Replace `your-project-id` with your own:
 
-<walkthrough-watcher-constant key="PROJECT_ID" value="your-project-id"></walkthrough-watcher-constant>
-
-Choose a region that supports Vertex AI (e.g., `us-central1`, `europe-west4`):
-
-<walkthrough-watcher-constant key="PROJECT_LOCATION" value="europe-west4"></walkthrough-watcher-constant>
+```bash
+export PROJECT_ID=your-project-id
+export PROJECT_LOCATION=europe-west4
+```
 
 Set the project and retrieve its number:
 
 ```bash
-gcloud config set project {{PROJECT_ID}}
-export PROJECT_NUMBER=$(gcloud projects describe {{PROJECT_ID}} --format="value(projectNumber)")
+gcloud config set project $PROJECT_ID
+export PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
 ```
 
 Now write these values into the Makefile so all `make` commands use them:
 
 ```bash
-sed -i "s|^PROJECT_ID.*|PROJECT_ID       := {{PROJECT_ID}}|" Makefile
+sed -i "s|^PROJECT_ID.*|PROJECT_ID       := $PROJECT_ID|" Makefile
 sed -i "s|^PROJECT_NUMBER.*|PROJECT_NUMBER   := $PROJECT_NUMBER|" Makefile
-sed -i "s|^PROJECT_LOCATION.*|PROJECT_LOCATION := {{PROJECT_LOCATION}}|" Makefile
+sed -i "s|^PROJECT_LOCATION.*|PROJECT_LOCATION := $PROJECT_LOCATION|" Makefile
 ```
 
 <walkthrough-editor-open-file filePath="Makefile">Verify the Makefile</walkthrough-editor-open-file>
@@ -71,13 +70,17 @@ make auth
 
 ## Enable required APIs
 
-Enable Vertex AI, Firestore, Cloud Run, Cloud Trace, and other required services.
+The workshop uses Vertex AI, Firestore, Cloud Run, and other GCP services. Enable the required APIs for your project:
 
-<walkthrough-enable-apis apis="aiplatform.googleapis.com,firestore.googleapis.com,run.googleapis.com,cloudtrace.googleapis.com,cloudbuild.googleapis.com,logging.googleapis.com,iam.googleapis.com"></walkthrough-enable-apis>
-
-```bash
-make setup-apis
-```
+<walkthrough-enable-apis apis=
+  "aiplatform.googleapis.com,
+  firestore.googleapis.com,
+  run.googleapis.com,
+  cloudtrace.googleapis.com,
+  cloudbuild.googleapis.com,
+  logging.googleapis.com,
+  iam.googleapis.com">
+</walkthrough-enable-apis>
 
 ## Generate the backend environment file
 
