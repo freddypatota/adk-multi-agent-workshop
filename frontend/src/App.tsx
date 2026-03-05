@@ -8,7 +8,6 @@ import { AttachedFile } from "@/components/InputForm";
 
 import { useAuth } from "@/hooks/useAuth";
 import { AuthProvider } from "@/contexts/AuthProvider";
-import { LoginPage } from "@/components/LoginPage";
 
 interface MessageWithAgent {
   type: "human" | "ai";
@@ -702,33 +701,11 @@ export function AppContent() {
   );
 }
 
-function AuthWrapper() {
-  const { user, loading } = useAuth();
-  const { t } = useTranslation();
-
-  if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground">{t('backend.waiting')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <LoginPage />;
-  }
-
-  return <AppContent />;
-}
-
 export default function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <AuthProvider>
-        <AuthWrapper />
+        <AppContent />
       </AuthProvider>
     </ThemeProvider>
   );

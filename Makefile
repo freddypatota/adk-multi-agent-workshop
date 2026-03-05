@@ -14,14 +14,6 @@ SERVICE_ACCOUNT  := $(SERVICE_NAME)-sa@$(PROJECT_ID).iam.gserviceaccount.com
 SERVICE_ACCOUNT_DISPLAY_NAME := 'Loan Drawdown Agent Cloud Run Service Account'
 SERVICE_URL      := https://$(SERVICE_NAME)-$(PROJECT_NUMBER).$(PROJECT_LOCATION).run.app
 
-# Firebase Configuration — update these for your Firebase project
-FIREBASE_API_KEY             := [Your Firebase API key, e.g. AIzaSy...]
-FIREBASE_AUTH_DOMAIN         := $(PROJECT_ID).firebaseapp.com
-FIREBASE_PROJECT_ID          := $(PROJECT_ID)
-FIREBASE_STORAGE_BUCKET      := $(PROJECT_ID).firebasestorage.app
-FIREBASE_MESSAGING_SENDER_ID := $(PROJECT_NUMBER)
-FIREBASE_APP_ID              := [Your Firebase app ID, e.g. 1:123456789012:web:abc123]
-
 # ==============================================================================
 # Installation & Setup
 # ==============================================================================
@@ -31,7 +23,7 @@ install:
 	@command -v uv >/dev/null 2>&1 || { echo "uv is not installed. Installing uv..."; curl -LsSf https://astral.sh/uv/0.8.13/install.sh | sh; source $$HOME/.local/bin/env; }
 	uv sync
 	npm --prefix frontend install
-	@command -v firebase >/dev/null 2>&1 || { echo "Installing Firebase CLI..."; npm install -g firebase-tools; }
+	npm --prefix frontend audit fix
 
 auth: # Authenticate with Google Cloud using gcloud CLI
 	gcloud auth application-default login
@@ -41,19 +33,6 @@ auth: # Authenticate with Google Cloud using gcloud CLI
 setup-apis:
 	gcloud services enable aiplatform.googleapis.com firestore.googleapis.com run.googleapis.com cloudtrace.googleapis.com cloudbuild.googleapis.com logging.googleapis.com iam.googleapis.com iap.googleapis.com --project $(PROJECT_ID)
 
-# Setup Firebase for frontend authentication
-setup-firebase:
-	firebase login
-	firebase projects:addfirebase $(PROJECT_ID) 2>/dev/null || echo "Firebase already enabled for $(PROJECT_ID)"
-	@echo ""
-	@echo "Next steps (manual in Firebase Console):"
-	@echo "  1. Go to https://console.firebase.google.com/project/$(PROJECT_ID)/authentication"
-	@echo "  2. Click 'Get started' to enable Authentication"
-	@echo "  3. Enable 'Email/Password' and 'Google' sign-in providers"
-	@echo "  4. Go to Settings > Authorized domains and add your Cloud Run domain:"
-	@echo "     $(SERVICE_NAME)-$(PROJECT_NUMBER).$(PROJECT_LOCATION).run.app"
-	@echo "  5. Run 'make frontend-env' to generate frontend/.env from Makefile variables"
-
 # Generate root .env for ADK agents from Makefile variables
 agent-env:
 	@echo 'GOOGLE_GENAI_USE_VERTEXAI="TRUE"' > .env
@@ -61,16 +40,6 @@ agent-env:
 	@echo 'GOOGLE_CLOUD_LOCATION="$(PROJECT_LOCATION)"' >> .env
 	@echo 'MODEL_NAME="$(MODEL_NAME)"' >> .env
 	@echo "Generated .env"
-
-# Generate frontend/.env from Makefile Firebase variables
-frontend-env:
-	@echo "VITE_FIREBASE_API_KEY=$(FIREBASE_API_KEY)" > frontend/.env
-	@echo "VITE_FIREBASE_AUTH_DOMAIN=$(FIREBASE_AUTH_DOMAIN)" >> frontend/.env
-	@echo "VITE_FIREBASE_PROJECT_ID=$(FIREBASE_PROJECT_ID)" >> frontend/.env
-	@echo "VITE_FIREBASE_STORAGE_BUCKET=$(FIREBASE_STORAGE_BUCKET)" >> frontend/.env
-	@echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$(FIREBASE_MESSAGING_SENDER_ID)" >> frontend/.env
-	@echo "VITE_FIREBASE_APP_ID=$(FIREBASE_APP_ID)" >> frontend/.env
-	@echo "Generated frontend/.env"
 
 setup-sa: ## Create or Update Service Account and grant necessary roles
 	@echo "Checking service account $(SERVICE_ACCOUNT)..."
@@ -142,13 +111,6 @@ build-frontend:
 
 # Deploy the agent remotely
 deploy:
-	@echo "Generating frontend/env.production..."
-	@echo "VITE_FIREBASE_API_KEY=$(FIREBASE_API_KEY)" > frontend/env.production
-	@echo "VITE_FIREBASE_AUTH_DOMAIN=$(FIREBASE_AUTH_DOMAIN)" >> frontend/env.production
-	@echo "VITE_FIREBASE_PROJECT_ID=$(FIREBASE_PROJECT_ID)" >> frontend/env.production
-	@echo "VITE_FIREBASE_STORAGE_BUCKET=$(FIREBASE_STORAGE_BUCKET)" >> frontend/env.production
-	@echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$(FIREBASE_MESSAGING_SENDER_ID)" >> frontend/env.production
-	@echo "VITE_FIREBASE_APP_ID=$(FIREBASE_APP_ID)" >> frontend/env.production
 	gcloud beta run deploy $(SERVICE_NAME) \
 		--source . \
 		--port 8080 \
@@ -167,16 +129,6 @@ deploy:
 		--memory "4Gi" \
 		--no-cpu-throttling \
 		--min 1
-		@echo "Adding IAP binding..."
-		gcloud beta iap web add-iam-policy-binding \
-			--member domain:$(DOMAIN) \
-			--role roles/iap.httpsResourceAccessor \
-			--region $(PROJECT_LOCATION) \
-			--resource-type cloud-run \
-			--service $(SERVICE_NAME) \
-			--condition None
-			@rm frontend/env.production
-	@echo "Cleaned up frontend/env.production"
 
 set-iap:
 	gcloud beta iap web add-iam-policy-binding \
@@ -246,13 +198,9 @@ install-win:
 	@powershell -Command "if (-not (Get-Command uv -ErrorAction SilentlyContinue)) { Write-Host 'Installing uv...'; irm https://astral.sh/uv/install.ps1 | iex }"
 	uv sync
 	npm --prefix frontend install
-	@powershell -Command "if (-not (Get-Command firebase -ErrorAction SilentlyContinue)) { npm install -g firebase-tools }"
 
 agent-env-win:
 	@powershell -Command "Set-Content -Path .env -Value @('GOOGLE_GENAI_USE_VERTEXAI=\"TRUE\"','GOOGLE_CLOUD_PROJECT=\"$(PROJECT_ID)\"','GOOGLE_CLOUD_LOCATION=\"$(PROJECT_LOCATION)\"','MODEL_NAME=\"$(MODEL_NAME)\"'); Write-Host 'Generated .env'"
-
-frontend-env-win:
-	@powershell -Command "Set-Content -Path frontend/.env -Value @('VITE_FIREBASE_API_KEY=$(FIREBASE_API_KEY)','VITE_FIREBASE_AUTH_DOMAIN=$(FIREBASE_AUTH_DOMAIN)','VITE_FIREBASE_PROJECT_ID=$(FIREBASE_PROJECT_ID)','VITE_FIREBASE_STORAGE_BUCKET=$(FIREBASE_STORAGE_BUCKET)','VITE_FIREBASE_MESSAGING_SENDER_ID=$(FIREBASE_MESSAGING_SENDER_ID)','VITE_FIREBASE_APP_ID=$(FIREBASE_APP_ID)'); Write-Host 'Generated frontend/.env'"
 
 clean-win:
 	@powershell -Command "Remove-Item -Recurse -Force -ErrorAction SilentlyContinue .mypy_cache, .ruff_cache, .pytest_cache; Get-ChildItem -Recurse -Directory -Filter '__pycache__' | Remove-Item -Recurse -Force"

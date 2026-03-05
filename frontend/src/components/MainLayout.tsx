@@ -11,8 +11,6 @@ import {
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@/hooks/useAuth";
-import { LogOut } from "lucide-react";
 
 interface MainLayoutProps {
     children: React.ReactNode;
@@ -31,7 +29,6 @@ export function MainLayout({ children, sidebar, theme, onToggleTheme, title, sho
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const sidebarRef = useRef<ImperativePanelHandle>(null);
     const { t } = useTranslation();
-    const { user, logout } = useAuth();
 
     const toggleSidebar = () => {
         const panel = sidebarRef.current;
@@ -57,23 +54,6 @@ export function MainLayout({ children, sidebar, theme, onToggleTheme, title, sho
                     {/* Desktop Controls */}
                     <div className="hidden md:flex items-center gap-2">
                         <div className="h-6 w-px bg-border mx-2" />
-
-                        <div className="flex items-center gap-2 mr-2">
-                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center" title={user?.email || 'User'}>
-                                <span className="text-xs font-bold text-primary">
-                                    {user?.email?.charAt(0).toUpperCase() || 'U'}
-                                </span>
-                            </div>
-                        </div>
-
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={logout}
-                            title="Sign out"
-                        >
-                            <LogOut className="h-5 w-5" />
-                        </Button>
 
                         {onNewSession && (
                             <Button
@@ -184,29 +164,6 @@ export function MainLayout({ children, sidebar, theme, onToggleTheme, title, sho
                         </div>
                     )}
 
-                    <div className="h-px bg-border" />
-
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                <span className="text-sm font-bold text-primary">
-                                    {user?.email?.charAt(0).toUpperCase() || 'U'}
-                                </span>
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-medium">{user?.displayName || 'User'}</span>
-                                <span className="text-xs text-muted-foreground">{user?.email}</span>
-                            </div>
-                        </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={logout}
-                            title="Sign out"
-                        >
-                            <LogOut className="h-5 w-5" />
-                        </Button>
-                    </div>
                 </div>
             )}
 
