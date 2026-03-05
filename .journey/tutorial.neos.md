@@ -80,17 +80,15 @@ make auth
 
 ## Enable required APIs
 
-The workshop uses Vertex AI, Firestore, Cloud Run, and other GCP services. Enable the required APIs for your project:
+The workshop uses Vertex AI, Firestore, Cloud Run, and other GCP services. Click the button below to enable the required APIs for your project:
 
-<walkthrough-enable-apis apis=
-  "aiplatform.googleapis.com,
-  firestore.googleapis.com,
-  run.googleapis.com,
-  cloudtrace.googleapis.com,
-  cloudbuild.googleapis.com,
-  logging.googleapis.com,
-  iam.googleapis.com">
-</walkthrough-enable-apis>
+<walkthrough-enable-apis apis="aiplatform.googleapis.com,firestore.googleapis.com,run.googleapis.com,cloudtrace.googleapis.com,cloudbuild.googleapis.com,logging.googleapis.com,iam.googleapis.com"></walkthrough-enable-apis>
+
+If the button above does not appear, run this command instead:
+
+```bash
+gcloud services enable aiplatform.googleapis.com firestore.googleapis.com run.googleapis.com cloudtrace.googleapis.com cloudbuild.googleapis.com logging.googleapis.com iam.googleapis.com
+```
 
 ## Generate the backend environment file
 
