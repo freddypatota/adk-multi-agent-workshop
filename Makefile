@@ -39,6 +39,17 @@ local-backend:
 	uv run uvicorn app.main:app --host localhost --port $(or $(PORT),8000) --reload
 
 # ==============================================================================
+# Testing & Evaluation (Bonus)
+# ==============================================================================
+
+test:
+	uv run pytest tests/unit
+
+eval:
+	uv run adk eval ./app/agents/loan_drawdown_agent $${EVALSET:-tests/eval/evalsets/basic_eval.evalset.json} \
+		$(if $(wildcard tests/eval/eval_config.json),--config_file_path=tests/eval/eval_config.json,)
+
+# ==============================================================================
 # Utilities
 # ==============================================================================
 

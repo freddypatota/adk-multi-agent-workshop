@@ -951,8 +951,50 @@ You've built a complete multi-agent loan drawdown processor!
 
 ### Next steps
 
-- **Try the React frontend**: Run `make local-backend` and `cd frontend && npm run dev` to see the full app with real-time workflow visualization
-- Deploy to Cloud Run: `make deploy`
-- Explore the [ADK documentation](https://google.github.io/adk-docs/)
-- Add more validation agents or custom tools
-- Review the evaluation framework in `tests/eval/`
+Explore the [ADK documentation](https://google.github.io/adk-docs/) or try the bonus challenges below.
+
+## Bonus: Testing & Evaluation
+
+Run unit tests to verify your tool implementations:
+
+```bash
+make test
+```
+
+ADK includes a built-in evaluation framework. Run the evaluation suite against the complete agent in `app/`:
+
+```bash
+make eval
+```
+
+This uses the eval configuration in `tests/eval/eval_config.json` which scores the agent on relevance, helpfulness, decision clarity, correct tool use, and safety.
+
+> **Docs:** [ADK Evaluation](https://google.github.io/adk-docs/evaluate/)
+
+## Bonus: Deploy to Cloud Run
+
+To deploy your agent as a Cloud Run service, create a service account and deploy:
+
+```bash
+gcloud iam service-accounts create loan-drawdown-sa --display-name "Loan Drawdown Agent SA" --project <walkthrough-project-id/>
+```
+
+```bash
+gcloud projects add-iam-policy-binding <walkthrough-project-id/> --member="serviceAccount:loan-drawdown-sa@<walkthrough-project-id/>.iam.gserviceaccount.com" --role="roles/aiplatform.user" --condition=None --quiet
+```
+
+```bash
+gcloud run deploy loan-drawdown-adk --source . --port 8080 --region $PROJECT_LOCATION --service-account loan-drawdown-sa@<walkthrough-project-id/>.iam.gserviceaccount.com --set-env-vars GOOGLE_GENAI_USE_VERTEXAI=TRUE,GOOGLE_CLOUD_PROJECT=<walkthrough-project-id/>,GOOGLE_CLOUD_LOCATION=$PROJECT_LOCATION,MODEL_NAME=gemini-2.5-flash --memory 4Gi --no-cpu-throttling --allow-unauthenticated
+```
+
+> **Docs:** [Cloud Run deployment](https://cloud.google.com/run/docs/deploying-source-code)
+
+## Bonus: Deploy to Agent Engine
+
+Agent Engine is a managed runtime for ADK agents on Vertex AI. Deploy your agent with the ADK CLI:
+
+```bash
+uv run adk deploy cloud_run --project <walkthrough-project-id/> --region $PROJECT_LOCATION --service_name loan-drawdown-adk --app_path app/agents/loan_drawdown_agent
+```
+
+> **Docs:** [Agent Engine](https://google.github.io/adk-docs/deploy/agent-engine/) | [ADK Deploy](https://google.github.io/adk-docs/deploy/)
