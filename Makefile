@@ -16,11 +16,6 @@ install:
 	uv sync
 	npm --prefix frontend install
 
-auth:
-	gcloud auth application-default login
-	gcloud config set project $(PROJECT_ID)
-	gcloud auth application-default set-quota-project $(PROJECT_ID)
-
 agent-env:
 	@echo 'GOOGLE_GENAI_USE_VERTEXAI="TRUE"' > .env
 	@echo 'GOOGLE_CLOUD_PROJECT="$(PROJECT_ID)"' >> .env

@@ -41,14 +41,24 @@ Select your GCP project above, then open the Makefile and update the project var
 
 ## Install and configure
 
-Install dependencies, authenticate, enable APIs, and generate the environment file:
+Install dependencies:
 
 ```bash
 make install
 ```
 
+Authenticate and set the active project:
+
 ```bash
-make auth
+gcloud auth application-default login
+```
+
+```bash
+gcloud config set project <walkthrough-project-id/>
+```
+
+```bash
+gcloud auth application-default set-quota-project <walkthrough-project-id/>
 ```
 
 <walkthrough-enable-apis apis="aiplatform.googleapis.com,firestore.googleapis.com,run.googleapis.com,cloudtrace.googleapis.com,cloudbuild.googleapis.com,logging.googleapis.com,iam.googleapis.com"></walkthrough-enable-apis>
