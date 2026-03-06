@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="280" height="50" viewBox="0 0 280 50">
-  <rect width="280" height="50" rx="8" fill="#1a73e8"/>
-  <text x="140" y="30" font-family="Google Sans, Roboto, Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">START WORKSHOP IN CLOUD SHELL</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="56" viewBox="0 0 320 56">
+  <rect width="320" height="56" rx="8" fill="#1a73e8"/>
+  <text x="50%" y="50%" font-family="Google Sans, Roboto, Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="central">START WORKSHOP IN CLOUD SHELL</text>
 </svg>
