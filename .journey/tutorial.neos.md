@@ -592,10 +592,18 @@ gcloud run deploy loan-drawdown-adk --source . --port 8080 --region $PROJECT_LOC
 
 ## Bonus: Deploy to Agent Engine
 
-Agent Engine is a managed runtime for ADK agents on Vertex AI. Deploy your agent with the ADK CLI:
+Agent Engine is a managed runtime for ADK agents on Vertex AI. First, enable the Cloud Resource Manager API:
 
 ```bash
-uv run adk deploy cloud_run --project <walkthrough-project-id/> --region $PROJECT_LOCATION --service_name loan-drawdown-adk --app_path app/agents/loan_drawdown_agent
+gcloud services enable cloudresourcemanager.googleapis.com --project <walkthrough-project-id/>
 ```
 
-> **Docs:** [Agent Engine](https://google.github.io/adk-docs/deploy/agent-engine/) | [ADK Deploy](https://google.github.io/adk-docs/deploy/)
+Deploy your agent with the ADK CLI:
+
+```bash
+uv run adk deploy agent_engine --project <walkthrough-project-id/> --region $PROJECT_LOCATION --display_name "Loan Drawdown Agent" app/agents/loan_drawdown_agent
+```
+
+The deploy process packages your code, builds a container, and deploys it to the managed Agent Engine service. This can take several minutes.
+
+> **Docs:** [Agent Engine deployment](https://google.github.io/adk-docs/deploy/agent-engine/deploy/) | [ADK CLI Reference](https://google.github.io/adk-docs/reference/cli/)
