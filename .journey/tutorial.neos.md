@@ -30,24 +30,19 @@ Click **Start** to begin.
 
 <walkthrough-project-setup></walkthrough-project-setup>
 
-Select your GCP project above, then set it as the active project and look up its number:
+Select your GCP project above, then set it as the active project:
 
 ```bash
 gcloud config set project <walkthrough-project-id/>
-```
-
-```bash
-gcloud projects describe <walkthrough-project-id/> --format="value(projectNumber)"
 ```
 
 Now open the Makefile and update the project variables at the top:
 
 <walkthrough-editor-select-line filePath="Makefile"
                               startLine="5" startCharacterOffset="0"
-                              endLine="8" endCharacterOffset="0">Open the Makefile at the project variables</walkthrough-editor-select-line>
+                              endLine="7" endCharacterOffset="0">Open the Makefile at the project variables</walkthrough-editor-select-line>
 
 - Set `PROJECT_ID` to `<walkthrough-project-id/>`
-- Set `PROJECT_NUMBER` to the number from the command above
 - Set `PROJECT_LOCATION` to a region that supports Vertex AI (e.g., `europe-west4`)
 
 ## Install and configure

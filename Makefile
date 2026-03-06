@@ -4,7 +4,6 @@
 
 # GCP Project Configuration — update these for your project
 PROJECT_ID       := [Your GCP project ID, e.g. my-gcp-project]
-PROJECT_NUMBER   := [Your GCP project number, e.g. 123456789012]
 PROJECT_LOCATION := [Your GCP region, e.g. europe-west4]
 MODEL_NAME       := gemini-2.5-flash
 
