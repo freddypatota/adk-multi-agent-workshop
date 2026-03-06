@@ -63,12 +63,6 @@ gcloud auth application-default set-quota-project <walkthrough-project-id/>
 
 <walkthrough-enable-apis apis="aiplatform.googleapis.com,firestore.googleapis.com,run.googleapis.com,cloudtrace.googleapis.com,cloudbuild.googleapis.com,logging.googleapis.com,iam.googleapis.com"></walkthrough-enable-apis>
 
-If the button above does not appear, run this command instead:
-
-```bash
-gcloud services enable aiplatform.googleapis.com firestore.googleapis.com run.googleapis.com cloudtrace.googleapis.com cloudbuild.googleapis.com logging.googleapis.com iam.googleapis.com
-```
-
 Generate the `.env` file for ADK agents:
 
 ```bash
@@ -79,20 +73,12 @@ Setup is complete. Time to build your first agent.
 
 ## Step 1: Your First Agent - Concepts
 
-<walkthrough-info-message>Solution: `solutions/step-01/`</walkthrough-info-message>
-
 **Learning objectives:**
 - Understand the basic structure of an ADK agent
 - Create an `Agent` with a name, model, and instruction
 - Use the ADK playground to test your agent
 
-### What is an Agent?
-
-An `Agent` wraps an LLM (like Gemini) with an instruction that defines its behavior. The simplest agent needs three things:
-
-- **name**: A unique identifier
-- **model**: Which LLM to use (e.g., `gemini-2.5-flash`)
-- **instruction**: A prompt that tells the agent how to behave
+An `Agent` wraps an LLM (like Gemini) with an instruction that defines its behavior. The simplest agent needs three things: a **name**, a **model**, and an **instruction**.
 
 ```python
 from google.adk.agents import Agent
@@ -104,69 +90,33 @@ agent = Agent(
 )
 ```
 
-## Step 1: Write the agent instruction
+> **Docs:** [LLM Agents](https://google.github.io/adk-docs/agents/llm-agents/) | [Models](https://google.github.io/adk-docs/agents/models/) | [Playground](https://google.github.io/adk-docs/runtime/web-interface/)
+
+## Step 1: Files to modify
+
+In this step, edit one file:
+
+- `agent.py` &mdash; define the instruction and create the root agent
+
+## Step 1: agent.py
 
 <walkthrough-editor-select-line filePath="steps/step-01-first-agent/agents/loan_drawdown_agent/agent.py"
                               startLine="4" startCharacterOffset="0"
-                              endLine="22" endCharacterOffset="0">Open agent.py and find the TODO comments</walkthrough-editor-select-line>
+                              endLine="22" endCharacterOffset="0">Open agent.py</walkthrough-editor-select-line>
 
-Fill in the `INSTRUCTION` string. Your instruction should:
+1. Fill in the `INSTRUCTION` string: tell the agent it is a "Loan Drawdown Assistant", it helps process loan drawdown requests, and it should ask users to upload an invoice.
 
-- Tell the agent it is a "Loan Drawdown Assistant"
-- Explain it helps users process loan drawdown requests from invoices
-- Ask users to upload an invoice to get started
+2. Replace `root_agent = None` with an `Agent` instance using `name="loan_drawdown_agent"`, `model=MODEL_NAME`, and `instruction=INSTRUCTION`.
 
-<details>
-<summary><strong>Hint: INSTRUCTION string</strong></summary>
+<walkthrough-editor-open-file filePath="solutions/step-01/agents/loan_drawdown_agent/agent.py">View solution</walkthrough-editor-open-file>
 
-```python
-INSTRUCTION = """
-You are the Loan Drawdown Assistant.
-Your role is to greet the user and guide them through the loan drawdown process.
-
-Capabilities:
-- You can chat with the user to understand their intent.
-- If the user wants to process a loan, tell them to upload an invoice file.
-
-Rules:
-- Be polite and professional.
-- If the user says "Hi" or "Hello", greet them and ask how you can help with their loan drawdown.
-- If they ask about loan drawdowns, explain that you can process invoices for approval.
-"""
-```
-
-</details>
-
-## Step 1: Create the Agent
-
-In the same file, replace `root_agent = None` with an actual `Agent` instance.
-
-The `root_agent` variable name is important &mdash; ADK looks for it to identify the entry point.
-
-<details>
-<summary><strong>Hint: root_agent definition</strong></summary>
-
-```python
-root_agent = Agent(
-    name="loan_drawdown_agent",
-    model=MODEL_NAME,
-    instruction=INSTRUCTION,
-)
-```
-
-</details>
-
-## Step 1: Test your agent
-
-Launch the ADK playground pointing at this step:
+## Step 1: Test
 
 ```bash
 make playground STEP=step-01-first-agent
 ```
 
-Click the <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview** button in the Cloud Shell toolbar, then select **Preview on port 8501** to open the playground.
-
-Try these prompts:
+Click the <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview** button, then select **Preview on port 8501**.
 
 ```
 Hello
@@ -190,16 +140,12 @@ Press **Ctrl+C** in the terminal to stop the playground before moving on.
 
 ## Step 2: Tools & Structured Output - Concepts
 
-<walkthrough-info-message>Solution: `solutions/step-02/`</walkthrough-info-message>
-
 **Learning objectives:**
 - Create function tools that agents can call
 - Understand how ADK auto-generates tool schemas from Python type hints
 - Define Pydantic models for structured data
 
-### Function Tools
-
-Any Python function can become an agent tool. ADK inspects the function's signature, type hints, and docstring to auto-generate the tool schema:
+Any Python function can become an agent tool. ADK inspects the function's signature, type hints, and docstring to auto-generate the tool schema for the LLM.
 
 ```python
 def check_sanctions(vendor_name: str) -> dict:
@@ -214,154 +160,77 @@ agent = Agent(
 )
 ```
 
-> **Docs:** [Function Tools](https://google.github.io/adk-docs/tools-custom/function-tools/)
+> **Docs:** [Function Tools](https://google.github.io/adk-docs/tools-custom/function-tools/) | [Tool Performance](https://google.github.io/adk-docs/tools-custom/performance/)
 
-## Step 2: Implement check_sanctions
+## Step 2: Files to modify
+
+In this step, edit four files in order:
+
+1. `compliance_tools.py` &mdash; implement the sanctions check tool
+2. `financial_tools.py` &mdash; implement the financial context tool
+3. `data_models.py` &mdash; define Pydantic models for structured output
+4. `agent.py` &mdash; connect the tools to the agent
+
+## Step 2: compliance_tools.py
 
 <walkthrough-editor-select-line filePath="steps/step-02-tools/agents/loan_drawdown_agent/tools/compliance_tools.py"
                               startLine="14" startCharacterOffset="0"
-                              endLine="24" endCharacterOffset="0">Open compliance_tools.py at the TODO</walkthrough-editor-select-line>
+                              endLine="24" endCharacterOffset="0">Open compliance_tools.py</walkthrough-editor-select-line>
 
-Implement the function body:
+Implement the `check_sanctions` function body:
 
 1. Normalize the vendor name (`.strip().lower()`)
 2. Check against `SANCTIONS_LIST`
 3. Return a dict with `check_name`, `status`, `flags`, `reason`
 
-<details>
-<summary><strong>Hint: check_sanctions body</strong></summary>
+<walkthrough-editor-open-file filePath="solutions/step-02/agents/loan_drawdown_agent/tools/compliance_tools.py">View solution</walkthrough-editor-open-file>
 
-```python
-    flags = []
-    if vendor_name.strip().lower() in SANCTIONS_LIST:
-        flags.append(f"Vendor '{vendor_name}' is on the Sanctions List.")
-
-    status = "FAIL" if flags else "PASS"
-    reason = "Sanctions match found." if flags else "Vendor not found in sanctions list."
-
-    return {"check_name": "Sanctions", "status": status, "flags": flags, "reason": reason}
-```
-
-</details>
-
-## Step 2: Implement get_financial_context
+## Step 2: financial_tools.py
 
 <walkthrough-editor-select-line filePath="steps/step-02-tools/agents/loan_drawdown_agent/tools/financial_tools.py"
                               startLine="19" startCharacterOffset="0"
-                              endLine="31" endCharacterOffset="0">Open financial_tools.py at the TODO</walkthrough-editor-select-line>
+                              endLine="31" endCharacterOffset="0">Open financial_tools.py</walkthrough-editor-select-line>
 
-Implement the function body:
+Implement the `get_financial_context` function body:
 
 1. Call `george_service.get_client_exposure(client_id)` to get limits
 2. Call `ibh_service.get_rate(currency, target_currency)` for the exchange rate
 3. Calculate remaining limit and whether the amount fits
 4. Return a dict with all financial context fields
 
-<details>
-<summary><strong>Hint: get_financial_context body</strong></summary>
+<walkthrough-editor-open-file filePath="solutions/step-02/agents/loan_drawdown_agent/tools/financial_tools.py">View solution</walkthrough-editor-open-file>
 
-```python
-    exposure_data = george_service.get_client_exposure(client_id)
-    rate = ibh_service.get_rate(currency, exposure_data["currency"])
-    converted_amount = invoice_amount * rate
-
-    approved = exposure_data["approved_limit"]
-    current = exposure_data["current_exposure"]
-    remaining = approved - current
-    is_within = remaining >= converted_amount
-
-    return {
-        "client_id": client_id,
-        "currency": exposure_data["currency"],
-        "approved_limit": approved,
-        "current_exposure": current,
-        "remaining_limit": remaining,
-        "invoice_amount_converted": converted_amount,
-        "conversion_rate": rate,
-        "is_within_limit": is_within,
-    }
-```
-
-</details>
-
-## Step 2: Define Pydantic models
+## Step 2: data_models.py
 
 <walkthrough-editor-select-line filePath="steps/step-02-tools/agents/loan_drawdown_agent/schemas/data_models.py"
                               startLine="5" startCharacterOffset="0"
-                              endLine="36" endCharacterOffset="0">Open data_models.py at the TODO</walkthrough-editor-select-line>
+                              endLine="36" endCharacterOffset="0">Open data_models.py</walkthrough-editor-select-line>
 
-Define:
+Define two Pydantic models:
 
 - `ComplianceCheckResult` &mdash; with `check_name`, `status`, `flags`, `reason`
 - `FinancialContext` &mdash; with `client_id`, `currency`, limits, and conversion info
 
-<details>
-<summary><strong>Hint: Pydantic models</strong></summary>
+<walkthrough-editor-open-file filePath="solutions/step-02/agents/loan_drawdown_agent/schemas/data_models.py">View solution</walkthrough-editor-open-file>
 
-```python
-from typing import Literal
-
-from pydantic import BaseModel, Field
-
-
-class ComplianceCheckResult(BaseModel):
-    check_name: Literal["Sanctions", "Prohibited Goods"] = Field(
-        ..., description="Name of the check"
-    )
-    status: Literal["PASS", "FAIL", "FLAGGED"] = Field(
-        ..., description="Whether the check passed, failed, or is inconclusive"
-    )
-    flags: list[str] = Field(
-        default_factory=list, description="List of specific flags or findings"
-    )
-    reason: str = Field(..., description="Explanation for the status")
-
-
-class FinancialContext(BaseModel):
-    client_id: str
-    currency: str = Field("RON", description="Currency of the credit limit")
-    approved_limit: float
-    current_exposure: float
-    remaining_limit: float
-    invoice_amount_converted: float
-    conversion_rate: float
-    is_within_limit: bool
-```
-
-</details>
-
-## Step 2: Connect tools to the agent
+## Step 2: agent.py
 
 <walkthrough-editor-select-line filePath="steps/step-02-tools/agents/loan_drawdown_agent/agent.py"
                               startLine="19" startCharacterOffset="0"
-                              endLine="27" endCharacterOffset="0">Open agent.py at the TODO</walkthrough-editor-select-line>
+                              endLine="27" endCharacterOffset="0">Open agent.py</walkthrough-editor-select-line>
 
 - Import your tool functions
 - Add `tools=[check_sanctions, get_financial_context]` to the Agent
 
-<details>
-<summary><strong>Hint: agent.py imports and tools</strong></summary>
+<walkthrough-editor-open-file filePath="solutions/step-02/agents/loan_drawdown_agent/agent.py">View solution</walkthrough-editor-open-file>
 
-```python
-from .tools.compliance_tools import check_sanctions
-from .tools.financial_tools import get_financial_context
-```
-
-Then add to the Agent constructor:
-
-```python
-    tools=[check_sanctions, get_financial_context],
-```
-
-</details>
-
-## Step 2: Test your tools
+## Step 2: Test
 
 ```bash
 make playground STEP=step-02-tools
 ```
 
-Use <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview** on port 8501 and try these prompts:
+Use <walkthrough-web-preview-icon></walkthrough-web-preview-icon> **Web Preview** on port 8501 and try:
 
 ```
 Check if 'Acme Corp' is sanctioned
@@ -389,221 +258,98 @@ Press **Ctrl+C** in the terminal to stop the playground before moving on.
 
 ## Step 3: Multi-Agent Workflow - Concepts
 
-<walkthrough-info-message>Solution: `solutions/step-03/`</walkthrough-info-message>
-
 **Learning objectives:**
 - Break a monolithic agent into specialized sub-agents
 - Use `SequentialAgent` to run agents in order
 - Use `ParallelAgent` to run agents concurrently
 - Understand `output_key` for passing data between agents via session state
 
-### SequentialAgent
+`SequentialAgent` runs sub-agents one after another. `ParallelAgent` runs them concurrently. When an agent has `output_key="my_result"`, its output is saved to `state["my_result"]`. Other agents reference it using `{my_result?}`.
 
-Runs sub-agents one after another:
+> **Docs:** [Multi-Agent Systems](https://google.github.io/adk-docs/agents/multi-agents/) | [Sequential Agents](https://google.github.io/adk-docs/agents/workflow-agents/sequential-agents/) | [Parallel Agents](https://google.github.io/adk-docs/agents/workflow-agents/parallel-agents/) | [State](https://google.github.io/adk-docs/sessions/state/)
 
-```python
-from google.adk.agents import SequentialAgent
+## Step 3: Files to modify
 
-pipeline = SequentialAgent(
-    name="my_pipeline",
-    sub_agents=[step_1, step_2, step_3],
-)
-```
+In this step, edit seven files in order:
 
-### ParallelAgent
+1. `extraction_agent.py` &mdash; create the extraction agent
+2. `sanctions_agent.py` &mdash; create the sanctions agent
+3. `prohibited_goods_agent.py` &mdash; create the prohibited goods agent
+4. `credit_ceiling_agent.py` &mdash; create the credit ceiling agent
+5. `decision_agent.py` &mdash; create the decision agent
+6. `sub_agents/__init__.py` &mdash; export all sub-agents
+7. `agent.py` &mdash; wire the workflow with ParallelAgent and SequentialAgent
 
-Runs sub-agents concurrently:
-
-```python
-from google.adk.agents import ParallelAgent
-
-parallel = ParallelAgent(
-    name="validation",
-    sub_agents=[check_a, check_b, check_c],
-)
-```
-
-### output_key & State
-
-When an agent has `output_key="my_result"`, its output is saved to `state["my_result"]`. Other agents reference it using `{my_result?}`.
-
-> **Docs:** [Multi-Agent Systems](https://google.github.io/adk-docs/agents/multi-agents/) | [State](https://google.github.io/adk-docs/sessions/state/)
-
-## Step 3: Create sub-agents
-
-Open each file in `sub_agents/` and create the Agent. Follow the TODO comments for the correct parameters.
-
-**Extraction Agent** &mdash; `output_key="extracted_invoice"`, `output_schema=InvoiceData`
+## Step 3: extraction_agent.py
 
 <walkthrough-editor-select-line filePath="steps/step-03-multi-agent/agents/loan_drawdown_agent/sub_agents/extraction_agent.py"
                               startLine="6" startCharacterOffset="0"
-                              endLine="22" endCharacterOffset="0">Open extraction_agent.py at the TODO</walkthrough-editor-select-line>
+                              endLine="22" endCharacterOffset="0">Open extraction_agent.py</walkthrough-editor-select-line>
 
-<details>
-<summary><strong>Hint: extraction_agent</strong></summary>
+Create the Agent with `output_key="extracted_invoice"` and `output_schema=InvoiceData`.
 
-```python
-extraction_agent = Agent(
-    name="extraction_agent",
-    model=MODEL_NAME,
-    instruction=EXTRACTION_INSTRUCTION,
-    output_key="extracted_invoice",
-    output_schema=InvoiceData,
-)
-```
+<walkthrough-editor-open-file filePath="solutions/step-03/agents/loan_drawdown_agent/sub_agents/extraction_agent.py">View solution</walkthrough-editor-open-file>
 
-</details>
-
-**Sanctions Agent** &mdash; `tools=[check_sanctions]`, `output_key="sanctions_result"`
+## Step 3: sanctions_agent.py
 
 <walkthrough-editor-select-line filePath="steps/step-03-multi-agent/agents/loan_drawdown_agent/sub_agents/sanctions_agent.py"
                               startLine="7" startCharacterOffset="0"
-                              endLine="20" endCharacterOffset="0">Open sanctions_agent.py at the TODO</walkthrough-editor-select-line>
+                              endLine="20" endCharacterOffset="0">Open sanctions_agent.py</walkthrough-editor-select-line>
 
-<details>
-<summary><strong>Hint: sanctions_agent</strong></summary>
+Create the Agent with `tools=[check_sanctions]`, `output_key="sanctions_result"`, `output_schema=ComplianceCheckResult`, and `include_contents="none"`.
 
-```python
-sanctions_agent = Agent(
-    name="sanctions_agent",
-    model=MODEL_NAME,
-    instruction=SANCTIONS_INSTRUCTION,
-    tools=[check_sanctions],
-    output_key="sanctions_result",
-    output_schema=ComplianceCheckResult,
-    include_contents="none",
-)
-```
+<walkthrough-editor-open-file filePath="solutions/step-03/agents/loan_drawdown_agent/sub_agents/sanctions_agent.py">View solution</walkthrough-editor-open-file>
 
-</details>
-
-**Prohibited Goods Agent** &mdash; `tools=[prohibited_goods_rag]`, `output_key="prohibited_goods_result"`
+## Step 3: prohibited_goods_agent.py
 
 <walkthrough-editor-select-line filePath="steps/step-03-multi-agent/agents/loan_drawdown_agent/sub_agents/prohibited_goods_agent.py"
                               startLine="7" startCharacterOffset="0"
-                              endLine="16" endCharacterOffset="0">Open prohibited_goods_agent.py at the TODO</walkthrough-editor-select-line>
+                              endLine="16" endCharacterOffset="0">Open prohibited_goods_agent.py</walkthrough-editor-select-line>
 
-<details>
-<summary><strong>Hint: prohibited_goods_agent</strong></summary>
+Create the Agent with `tools=[prohibited_goods_rag]`, `output_key="prohibited_goods_result"`, and `include_contents="none"`.
 
-```python
-prohibited_goods_agent = Agent(
-    name="prohibited_goods_agent",
-    model=MODEL_NAME,
-    instruction=PROHIBITED_GOODS_INSTRUCTION,
-    tools=[prohibited_goods_rag],
-    output_key="prohibited_goods_result",
-    output_schema=ComplianceCheckResult,
-    include_contents="none",
-)
-```
+<walkthrough-editor-open-file filePath="solutions/step-03/agents/loan_drawdown_agent/sub_agents/prohibited_goods_agent.py">View solution</walkthrough-editor-open-file>
 
-</details>
-
-**Credit Ceiling Agent** &mdash; `tools=[get_financial_context]`, `output_key="financial_context"`
+## Step 3: credit_ceiling_agent.py
 
 <walkthrough-editor-select-line filePath="steps/step-03-multi-agent/agents/loan_drawdown_agent/sub_agents/credit_ceiling_agent.py"
                               startLine="7" startCharacterOffset="0"
-                              endLine="15" endCharacterOffset="0">Open credit_ceiling_agent.py at the TODO</walkthrough-editor-select-line>
+                              endLine="15" endCharacterOffset="0">Open credit_ceiling_agent.py</walkthrough-editor-select-line>
 
-<details>
-<summary><strong>Hint: credit_ceiling_agent</strong></summary>
+Create the Agent with `tools=[get_financial_context]`, `output_key="financial_context"`, and `include_contents="none"`.
 
-```python
-credit_ceiling_agent = Agent(
-    name="credit_ceiling_agent",
-    model=MODEL_NAME,
-    instruction=FINANCIAL_INSTRUCTION,
-    tools=[get_financial_context],
-    output_key="financial_context",
-    output_schema=FinancialContext,
-    include_contents="none",
-)
-```
+<walkthrough-editor-open-file filePath="solutions/step-03/agents/loan_drawdown_agent/sub_agents/credit_ceiling_agent.py">View solution</walkthrough-editor-open-file>
 
-</details>
-
-**Decision Agent** &mdash; `output_key="validation_report"`, `output_schema=ValidationReport`
+## Step 3: decision_agent.py
 
 <walkthrough-editor-select-line filePath="steps/step-03-multi-agent/agents/loan_drawdown_agent/sub_agents/decision_agent.py"
                               startLine="6" startCharacterOffset="0"
-                              endLine="14" endCharacterOffset="0">Open decision_agent.py at the TODO</walkthrough-editor-select-line>
+                              endLine="14" endCharacterOffset="0">Open decision_agent.py</walkthrough-editor-select-line>
 
-<details>
-<summary><strong>Hint: decision_agent</strong></summary>
+Create the Agent with `output_key="validation_report"`, `output_schema=ValidationReport`, and `include_contents="none"`.
 
-```python
-decision_agent = Agent(
-    name="decision_agent",
-    model=MODEL_NAME,
-    instruction=DECISION_INSTRUCTION,
-    output_key="validation_report",
-    output_schema=ValidationReport,
-    include_contents="none",
-)
-```
+<walkthrough-editor-open-file filePath="solutions/step-03/agents/loan_drawdown_agent/sub_agents/decision_agent.py">View solution</walkthrough-editor-open-file>
 
-</details>
+## Step 3: __init__.py and agent.py
 
-## Step 3: Wire the workflow
+<walkthrough-editor-select-line filePath="steps/step-03-multi-agent/agents/loan_drawdown_agent/sub_agents/__init__.py"
+                              startLine="0" startCharacterOffset="0"
+                              endLine="1" endCharacterOffset="0">Open sub_agents/__init__.py</walkthrough-editor-select-line>
+
+Import all 5 sub-agents.
 
 <walkthrough-editor-select-line filePath="steps/step-03-multi-agent/agents/loan_drawdown_agent/agent.py"
                               startLine="5" startCharacterOffset="0"
-                              endLine="26" endCharacterOffset="0">Open agent.py at the TODO comments</walkthrough-editor-select-line>
+                              endLine="26" endCharacterOffset="0">Open agent.py</walkthrough-editor-select-line>
 
 1. Import the sub-agents
 2. Create `validation_layer` (ParallelAgent) with the 3 validation agents
 3. Create `loan_process` (SequentialAgent): extraction &rarr; validation_layer &rarr; decision
 4. Set `root_agent`'s `sub_agents=[loan_process]`
 
-Don't forget to export your sub-agents in `sub_agents/__init__.py`.
+<walkthrough-editor-open-file filePath="solutions/step-03/agents/loan_drawdown_agent/agent.py">View solution</walkthrough-editor-open-file>
 
-<details>
-<summary><strong>Hint: sub_agents/__init__.py</strong></summary>
-
-```python
-from .credit_ceiling_agent import credit_ceiling_agent
-from .decision_agent import decision_agent
-from .extraction_agent import extraction_agent
-from .prohibited_goods_agent import prohibited_goods_agent
-from .sanctions_agent import sanctions_agent
-```
-
-</details>
-
-<details>
-<summary><strong>Hint: agent.py wiring</strong></summary>
-
-```python
-from google.adk.agents import Agent, ParallelAgent, SequentialAgent
-from .sub_agents import (
-    credit_ceiling_agent, decision_agent, extraction_agent,
-    prohibited_goods_agent, sanctions_agent,
-)
-```
-
-```python
-validation_layer = ParallelAgent(
-    name="validation_layer",
-    sub_agents=[prohibited_goods_agent, sanctions_agent, credit_ceiling_agent],
-)
-
-loan_process = SequentialAgent(
-    name="loan_process",
-    sub_agents=[extraction_agent, validation_layer, decision_agent],
-)
-
-root_agent = Agent(
-    name="loan_drawdown_agent",
-    model=MODEL_NAME,
-    instruction=ROOT_ORCHESTRATOR_INSTRUCTION,
-    sub_agents=[loan_process],
-)
-```
-
-</details>
-
-## Step 3: Test multi-agent workflow
+## Step 3: Test
 
 ```bash
 make playground STEP=step-03-multi-agent
@@ -625,18 +371,12 @@ Press **Ctrl+C** in the terminal to stop the playground before moving on.
 
 ## Step 4: AgentTool & Callbacks - Concepts
 
-<walkthrough-info-message>Solution: `solutions/step-04/`</walkthrough-info-message>
-
 **Learning objectives:**
 - Understand the difference between `sub_agents` and `AgentTool`
 - Use `before_agent_callback` to run logic before each agent invocation
 - Detect file uploads from session events
 
-### AgentTool vs sub_agents
-
-**`sub_agents`** &mdash; Automatic delegation. The LLM doesn't control when it happens.
-
-**`AgentTool`** &mdash; Wraps an agent as a tool. The root agent's LLM decides when to call it.
+**`sub_agents`** &mdash; automatic delegation. **`AgentTool`** &mdash; wraps an agent as a tool so the LLM decides when to call it.
 
 ```python
 from google.adk.tools.agent_tool import AgentTool
@@ -647,17 +387,20 @@ root_agent = Agent(
 )
 ```
 
-### before_agent_callback
+> **Docs:** [Multi-Agent Systems](https://google.github.io/adk-docs/agents/multi-agents/) | [Callbacks](https://google.github.io/adk-docs/callbacks/) | [Events](https://google.github.io/adk-docs/events/)
 
-Runs before each agent invocation. Useful for detecting file uploads and updating session state.
+## Step 4: Files to modify
 
-> **Docs:** [Callbacks](https://google.github.io/adk-docs/callbacks/) | [Events](https://google.github.io/adk-docs/events/)
+In this step, edit two files:
 
-## Step 4: Implement the file upload callback
+1. `file_upload_callback.py` &mdash; implement the file upload detection callback
+2. `agent.py` &mdash; switch from sub_agents to AgentTool and add the callback
+
+## Step 4: file_upload_callback.py
 
 <walkthrough-editor-select-line filePath="steps/step-04-agent-tool/agents/loan_drawdown_agent/callbacks/file_upload_callback.py"
                               startLine="12" startCharacterOffset="0"
-                              endLine="27" endCharacterOffset="0">Open file_upload_callback.py at the TODO</walkthrough-editor-select-line>
+                              endLine="27" endCharacterOffset="0">Open file_upload_callback.py</walkthrough-editor-select-line>
 
 Implement the event scanning logic:
 
@@ -666,71 +409,20 @@ Implement the event scanning logic:
 3. Check each part for `inline_data` or `file_data`
 4. Update state with `has_uploaded_file` and `uploaded_file_details`
 
-<details>
-<summary><strong>Hint: file_upload_callback body</strong></summary>
+<walkthrough-editor-open-file filePath="solutions/step-04/agents/loan_drawdown_agent/callbacks/file_upload_callback.py">View solution</walkthrough-editor-open-file>
 
-```python
-async def file_upload_callback(callback_context: CallbackContext) -> None:
-    files = []
-
-    for event in reversed(callback_context.session.events):
-        if (
-            getattr(event, "role", "") == "user"
-            or getattr(event, "author", "") == "user"
-        ):
-            if getattr(event, "content", None):
-                for part in getattr(event.content, "parts", []):
-                    if getattr(part, "inline_data", None):
-                        display_name = getattr(part.inline_data, "display_name", None) or "uploaded_file"
-                        mime_type = getattr(part.inline_data, "mime_type", "unknown")
-                        files.append(f"'{display_name}' type: {mime_type}")
-                    elif getattr(part, "file_data", None):
-                        file_uri = getattr(part.file_data, "file_uri", "uploaded_file")
-                        mime_type = getattr(part.file_data, "mime_type", "unknown")
-                        files.append(f"'{file_uri}' type: {mime_type}")
-            break
-
-    if len(files) > 0:
-        callback_context.state["has_uploaded_file"] = True
-        callback_context.state["uploaded_file_details"] = files
-    if "client_id" not in callback_context.state:
-        callback_context.state["client_id"] = "demo_client_001"
-```
-
-</details>
-
-## Step 4: Switch to AgentTool
+## Step 4: agent.py
 
 <walkthrough-editor-select-line filePath="steps/step-04-agent-tool/agents/loan_drawdown_agent/agent.py"
                               startLine="23" startCharacterOffset="0"
-                              endLine="41" endCharacterOffset="0">Open agent.py at the TODO</walkthrough-editor-select-line>
+                              endLine="41" endCharacterOffset="0">Open agent.py</walkthrough-editor-select-line>
 
-1. Import `AgentTool` from `google.adk.tools.agent_tool`
-2. Import `file_upload_callback`
-3. Change `sub_agents=[loan_process]` to `tools=[AgentTool(agent=loan_process)]`
-4. Add `before_agent_callback=file_upload_callback`
+1. Change `sub_agents=[loan_process]` to `tools=[AgentTool(agent=loan_process)]`
+2. Add `before_agent_callback=file_upload_callback`
 
-<details>
-<summary><strong>Hint: agent.py with AgentTool</strong></summary>
+<walkthrough-editor-open-file filePath="solutions/step-04/agents/loan_drawdown_agent/agent.py">View solution</walkthrough-editor-open-file>
 
-```python
-from google.adk.tools.agent_tool import AgentTool
-from .callbacks.file_upload_callback import file_upload_callback
-```
-
-```python
-root_agent = Agent(
-    name="loan_drawdown_agent",
-    model=MODEL_NAME,
-    instruction=ROOT_ORCHESTRATOR_INSTRUCTION,
-    before_agent_callback=file_upload_callback,
-    tools=[AgentTool(agent=loan_process)],
-)
-```
-
-</details>
-
-## Step 4: Test AgentTool
+## Step 4: Test
 
 ```bash
 make playground STEP=step-04-agent-tool
@@ -758,120 +450,57 @@ Process the loan
 
 Press **Ctrl+C** in the terminal to stop the playground before moving on.
 
-## Step 5: File Handling - Concepts
-
-<walkthrough-info-message>Solution: `solutions/step-05/`</walkthrough-info-message>
+## Step 5: File Handling & Batch Processing - Concepts
 
 **Learning objectives:**
 - Use `before_model_callback` to modify the LLM request before it's sent
 - Inject multimodal content (files) into an LLM context
 - Add batch processing support with wrapper schemas
 
-### Why file injection is needed
-
-When the root agent delegates to `loan_process` via `AgentTool`, the sub-agents run in a scoped context and can't see the raw file bytes. The `inject_invoice_content` callback bridges this gap by injecting file content directly into the LLM request.
-
-### before_model_callback
-
-Runs before each LLM call. It receives the `LlmRequest` and can modify contents before they're sent to the model.
+When the root agent delegates via `AgentTool`, sub-agents can't see the raw file bytes. The `inject_invoice_content` callback bridges this gap by injecting file content directly into the LLM request before it's sent.
 
 > **Docs:** [Callbacks](https://google.github.io/adk-docs/callbacks/) | [Artifacts](https://google.github.io/adk-docs/artifacts/)
 
-## Step 5: Implement inject_invoice_content
+## Step 5: Files to modify
+
+In this step, edit four files in order:
+
+1. `inject_invoice_content.py` &mdash; implement the file injection callback
+2. `extraction_agent.py` &mdash; connect the callback and switch to batch schema
+3. `data_models.py` &mdash; define batch wrapper models
+4. `prompts.py` &mdash; update prompts for batch processing
+
+## Step 5: inject_invoice_content.py
 
 <walkthrough-editor-select-line filePath="steps/step-05-file-handling/agents/loan_drawdown_agent/callbacks/inject_invoice_content.py"
                               startLine="47" startCharacterOffset="0"
-                              endLine="95" endCharacterOffset="0">Open inject_invoice_content.py at the TODO</walkthrough-editor-select-line>
+                              endLine="95" endCharacterOffset="0">Open inject_invoice_content.py</walkthrough-editor-select-line>
 
-Implement:
+Implement the three TODO sections:
 
 1. Load artifacts by key (try/except for failures)
 2. Fallback: reconstruct Parts from `_raw_invoice_files` in state
 3. Append the file parts + a text label to `llm_request.contents`
 
-<details>
-<summary><strong>Hint: inject_invoice_content body</strong></summary>
+<walkthrough-editor-open-file filePath="solutions/step-05/agents/loan_drawdown_agent/callbacks/inject_invoice_content.py">View solution</walkthrough-editor-open-file>
 
-```python
-async def inject_invoice_content(
-    callback_context: CallbackContext, llm_request: LlmRequest
-) -> None:
-    artifact_keys = callback_context.state.get("invoice_artifact_keys", [])
-    raw_files = callback_context.state.get("_raw_invoice_files", [])
-
-    parts: list[types.Part] = []
-
-    for key in artifact_keys:
-        try:
-            part = await callback_context.load_artifact(key)
-            if part is not None:
-                parts.append(part)
-        except Exception:
-            logger.debug("Artifact load failed for %s", key)
-
-    if not parts and raw_files:
-        for raw in raw_files:
-            data = base64.b64decode(raw["data"]) if raw.get("data") else b""
-            parts.append(
-                types.Part(
-                    inline_data=types.Blob(
-                        mime_type=raw.get("mime_type", "application/octet-stream"),
-                        data=data,
-                    )
-                )
-            )
-
-    if not parts:
-        return None
-
-    label = (
-        "This is the invoice file to extract data from."
-        if len(parts) == 1
-        else f"These are {len(parts)} uploaded invoice files. Extract data from ALL of them."
-    )
-    parts.append(types.Part(text=label))
-
-    llm_request.contents.append(types.Content(role="user", parts=parts))
-    return None
-```
-
-</details>
-
-## Step 5: Connect to extraction_agent
+## Step 5: extraction_agent.py
 
 <walkthrough-editor-select-line filePath="steps/step-05-file-handling/agents/loan_drawdown_agent/sub_agents/extraction_agent.py"
                               startLine="4" startCharacterOffset="0"
-                              endLine="19" endCharacterOffset="0">Open extraction_agent.py at the TODO</walkthrough-editor-select-line>
+                              endLine="19" endCharacterOffset="0">Open extraction_agent.py</walkthrough-editor-select-line>
 
-- Import `inject_invoice_content`
-- Add `before_model_callback=inject_invoice_content` to the Agent
+- Import `inject_invoice_content` from callbacks
+- Change `output_schema` from `InvoiceData` to `InvoiceBatch`
+- Add `before_model_callback=inject_invoice_content`
 
-<details>
-<summary><strong>Hint: extraction_agent with callback</strong></summary>
+<walkthrough-editor-open-file filePath="solutions/step-05/agents/loan_drawdown_agent/sub_agents/extraction_agent.py">View solution</walkthrough-editor-open-file>
 
-```python
-from ..callbacks.inject_invoice_content import inject_invoice_content
-from ..schemas.data_models import InvoiceBatch
-```
-
-```python
-extraction_agent = Agent(
-    name="extraction_agent",
-    model=MODEL_NAME,
-    instruction=EXTRACTION_INSTRUCTION,
-    output_key="extracted_invoice",
-    output_schema=InvoiceBatch,
-    before_model_callback=inject_invoice_content,
-)
-```
-
-</details>
-
-## Step 5: Add batch processing schemas
+## Step 5: data_models.py
 
 <walkthrough-editor-select-line filePath="steps/step-05-file-handling/agents/loan_drawdown_agent/schemas/data_models.py"
                               startLine="58" startCharacterOffset="0"
-                              endLine="80" endCharacterOffset="0">Open data_models.py at the TODO</walkthrough-editor-select-line>
+                              endLine="80" endCharacterOffset="0">Open data_models.py</walkthrough-editor-select-line>
 
 Define 4 batch wrapper models:
 
@@ -880,47 +509,19 @@ Define 4 batch wrapper models:
 - `FinancialBatchContext` &mdash; wraps `list[FinancialContext]` in a `results` field
 - `BatchValidationReport` &mdash; wraps `list[ValidationReport]` in a `reports` field
 
-<details>
-<summary><strong>Hint: batch wrapper models</strong></summary>
+<walkthrough-editor-open-file filePath="solutions/step-05/agents/loan_drawdown_agent/schemas/data_models.py">View solution</walkthrough-editor-open-file>
 
-```python
-class InvoiceBatch(BaseModel):
-    invoices: list[InvoiceData] = Field(
-        ..., description="List of extracted invoices, one per uploaded file"
-    )
-
-
-class ComplianceBatchResult(BaseModel):
-    results: list[ComplianceCheckResult] = Field(
-        ..., description="One compliance result per invoice, in the same order"
-    )
-
-
-class FinancialBatchContext(BaseModel):
-    results: list[FinancialContext] = Field(
-        ..., description="One financial context per invoice, in the same order"
-    )
-
-
-class BatchValidationReport(BaseModel):
-    reports: list[ValidationReport] = Field(
-        ..., description="One validation report per invoice, in the same order"
-    )
-```
-
-</details>
-
-## Step 5: Update sub-agents for batch processing
-
-Update each sub-agent's `output_schema` to the batch wrapper. Look for `TODO(workshop)` comments in each file.
-
-Then update the prompts to tell each agent to process **all** invoices, not just one.
+## Step 5: prompts.py
 
 <walkthrough-editor-select-line filePath="steps/step-05-file-handling/agents/loan_drawdown_agent/config/prompts.py"
                               startLine="0" startCharacterOffset="0"
                               endLine="5" endCharacterOffset="0">Open prompts.py</walkthrough-editor-select-line>
 
-## Step 5: Test in the playground
+Update the prompts to tell each agent to process **all** invoices, not just one. Follow the `TODO(workshop)` comment at the top.
+
+<walkthrough-editor-open-file filePath="solutions/step-05/agents/loan_drawdown_agent/config/prompts.py">View solution</walkthrough-editor-open-file>
+
+## Step 5: Test
 
 ```bash
 make playground STEP=step-05-file-handling
