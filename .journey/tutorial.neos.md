@@ -30,13 +30,7 @@ Click **Start** to begin.
 
 <walkthrough-project-setup></walkthrough-project-setup>
 
-Select your GCP project above, then set it as the active project:
-
-```bash
-gcloud config set project <walkthrough-project-id/>
-```
-
-Now open the Makefile and update the project variables at the top:
+Select your GCP project above, then open the Makefile and update the project variables at the top:
 
 <walkthrough-editor-select-line filePath="Makefile"
                               startLine="5" startCharacterOffset="0"
