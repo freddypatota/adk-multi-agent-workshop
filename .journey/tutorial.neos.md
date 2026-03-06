@@ -26,33 +26,21 @@ By the end, you will have:
 
 Click **Start** to begin.
 
-## Select your project
+## Project setup
 
 <walkthrough-project-setup></walkthrough-project-setup>
 
-Select your GCP project above.
-
-Choose a region that supports Vertex AI (e.g., `us-central1`, `europe-west4`):
-
-```bash
-export PROJECT_LOCATION=europe-west4
-```
-
-## Configure the Makefile
-
-Set your active project and retrieve its number:
+Select your GCP project above, then set it as the active project and look up its number:
 
 ```bash
 gcloud config set project <walkthrough-project-id/>
 ```
 
-To look up your project number, run:
-
 ```bash
 gcloud projects describe <walkthrough-project-id/> --format="value(projectNumber)"
 ```
 
-Now open the Makefile in the editor and update the variables at the top with your values:
+Now open the Makefile and update the project variables at the top:
 
 <walkthrough-editor-select-line filePath="Makefile"
                               startLine="5" startCharacterOffset="0"
@@ -60,27 +48,19 @@ Now open the Makefile in the editor and update the variables at the top with you
 
 - Set `PROJECT_ID` to `<walkthrough-project-id/>`
 - Set `PROJECT_NUMBER` to the number from the command above
-- Set `PROJECT_LOCATION` to your chosen region (e.g., `europe-west4`)
+- Set `PROJECT_LOCATION` to a region that supports Vertex AI (e.g., `europe-west4`)
 
-## Install dependencies
+## Install and configure
 
-Install Python packages and frontend npm packages.
+Install dependencies, authenticate, enable APIs, and generate the environment file:
 
 ```bash
 make install
 ```
 
-## Authenticate with Google Cloud
-
-Log in and set your project.
-
 ```bash
 make auth
 ```
-
-## Enable required APIs
-
-The workshop uses Vertex AI, Firestore, Cloud Run, and other GCP services. Click the button below to enable the required APIs for your project:
 
 <walkthrough-enable-apis apis="aiplatform.googleapis.com,firestore.googleapis.com,run.googleapis.com,cloudtrace.googleapis.com,cloudbuild.googleapis.com,logging.googleapis.com,iam.googleapis.com"></walkthrough-enable-apis>
 
@@ -90,17 +70,11 @@ If the button above does not appear, run this command instead:
 gcloud services enable aiplatform.googleapis.com firestore.googleapis.com run.googleapis.com cloudtrace.googleapis.com cloudbuild.googleapis.com logging.googleapis.com iam.googleapis.com
 ```
 
-## Generate the backend environment file
-
-Create the `.env` file that ADK agents use for configuration.
+Generate the `.env` file for ADK agents:
 
 ```bash
 make agent-env
 ```
-
-This creates a `.env` file at the project root with your GCP project settings.
-
----
 
 Setup is complete. Time to build your first agent.
 
